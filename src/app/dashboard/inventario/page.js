@@ -1,4 +1,5 @@
 'use client'
+import Aside from "@/app/components/aside";
 import React from "react";
 import { useState, useEffect } from "react";
 
@@ -12,8 +13,9 @@ function page() {
     }, []);
 
     return (
-        <main>
+        <main className="flex">
             {/* <Header title={"Inicio"} fecha={"29 Feb"} /> */}
+            <Aside />
             <div className="containIni">
                 <div className="informe">
                     <div className="tituInfo">Ordenes Recientes</div>
