@@ -5,6 +5,7 @@ import Aside from "../components/aside";
 import Image from "next/image";
 import DataTable from 'react-data-table-component';
 import { dataHome, columsHome } from "@/utils/tables";
+import { CalendarFold } from "lucide-react";
 import Pies from "@/components/stats";
 
 function Page() {
@@ -23,16 +24,18 @@ function Page() {
             .then(data => setProducts(data.data));
     }, []);
 
+    const date = new Date();
+
     return (
         <main className="flex flex-col md:flex-row overflow-y-hidden">
             {/* <Header title={"Inicio"} fecha={"29 Feb"} /> */}
             <Aside />
-            <div className="w-full p-6">
-                <div className="overflo-auto">
-                    <div className="flex items-center justify-between">
+            <div className="w-full p-6 ml-0 md:ml-[150px] 2xl:ml-[200px] mt-[80px] md:mt-0">
+                <div>
+                    <div className="flex items-center justify-between px-4">
                         <h3 className="font-semibold text-xl">Inicio</h3>
-                        <div>
-                            <input type="date" />
+                        <div className="flex items-center gap-2">
+                            <CalendarFold size={20}/> {date.toLocaleDateString()}
                         </div>
                     </div>
                     <div className="my-4 w-full max-h-screen flex flex-col lg:flex-row justify-between gap-4 overflow-auto">

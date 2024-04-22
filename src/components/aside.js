@@ -13,7 +13,7 @@ function Aside() {
         setMenu(!menu);
     };
     return (
-        <aside className={`${menu ? "h-auto md:h-screen md:max-h-screen max-h-[100px] max-w-full w-full md:max-w-[150px] md:min-w-[150px] 2xl:min-w-[200px] 2xl:max-w-[200px]" : "max-w-full w-full md:min-w-[90px] md:max-w-[90px] h-auto max-h-[100px] md:h-screen md:max-h-screen 2xl:max-w-[110px] 2xl:min-w-[110px]"} bg-gray-100 md:flex md:flex-col flex-row justify-evenly md:justify-between items-center p-2 transition-all duration-150`}>
+        <aside className={`${menu ? "h-auto md:h-screen md:max-h-screen max-h-[100px] max-w-full w-full md:max-w-[150px] md:min-w-[150px] 2xl:min-w-[200px] 2xl:max-w-[200px]" : "max-w-full w-full md:min-w-[90px] md:max-w-[90px] h-auto max-h-[100px] md:h-screen md:max-h-screen 2xl:max-w-[110px] 2xl:min-w-[110px]"} z-[100000] fixed left-0 bg-gray-100 md:flex md:flex-col flex-row justify-evenly md:justify-between items-center p-2 transition-all duration-150`}>
             <div className="flex flex-row md:flex-col justify-between md:justify-center items-center">
                 <div className="p-2 cursor-pointer z-[100]" onClick={toggleMenu}>
                     {menu ? <X /> : <Menu />}
