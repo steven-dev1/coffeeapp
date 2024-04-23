@@ -1,9 +1,31 @@
 export const columsHome = [
 	{
-		name: 'Id',
-		selector: row => row.id,
+		name: 'Nombre',
+		selector: row => row.nombre,
 		sortable: true,
 	},
+	{
+		name: 'Metodo',
+		selector: row => row.metodo,
+		sortable: true,
+	},
+	{
+		name: 'Tipo',
+		selector: row => row.tipo,
+		sortable: true,
+	},
+	{
+		name: 'Fecha',
+		selector: row => row.fecha,
+		sortable: true,
+	},
+	{
+		name: 'Total',
+		selector: row => row.total,
+		sortable: true,
+	},
+];
+export const columsPopular = [
 	{
 		name: 'Producto',
 		selector: row => row.product,
@@ -12,16 +34,6 @@ export const columsHome = [
 	{
 		name: 'Precio',
 		selector: row => row.price,
-		sortable: true,
-	},
-	{
-		name: 'Cantidad',
-		selector: row => row.cant,
-		sortable: true,
-	},
-	{
-		name: 'Total',
-		selector: row => row.total,
 		sortable: true,
 	},
 ];
@@ -76,19 +88,19 @@ export const dataInventory = [
 		name: 'Coca-cola',
 		price: 2000,
 		cant: 19,
-		actions: <div className="flex gap-2 items-center"><button className="bg-red-500 p-2 rounded-lg text-white">Editar</button><button className="bg-red-500 p-2 rounded-lg text-white">Eliminar</button></div>,
+		actions: <div className="flex gap-2 items-center"><button className="bg-sky-500 p-2 rounded-lg text-white">Editar</button><button className="bg-red-500 p-2 rounded-lg text-white">Eliminar</button></div>,
 	},
   	{
 		name: 'Detodito picante',
 		price: 2500,
 		cant: 13,
-		actions: <div className="flex gap-2 items-center"><button className="bg-red-500 p-2 rounded-lg text-white">Editar</button><button className="bg-red-500 p-2 rounded-lg text-white">Eliminar</button></div>,
+		actions: <div className="flex gap-2 items-center"><button className="bg-sky-500 p-2 rounded-lg text-white">Editar</button><button className="bg-red-500 p-2 rounded-lg text-white">Eliminar</button></div>,
 	},
   	{
 		name: 'Pizzas',
 		price: 3500,
 		cant: 20,
-		actions: <div className="flex gap-2 items-center"><button className="bg-red-500 p-2 rounded-lg text-white">Editar</button><button className="bg-red-500 p-2 rounded-lg text-white">Eliminar</button></div>,
+		actions: <div className="flex gap-2 items-center"><button className="bg-sky-500 p-2 rounded-lg text-white">Editar</button><button className="bg-red-500 p-2 rounded-lg text-white">Eliminar</button></div>,
 	},
 ]
 
@@ -122,6 +134,10 @@ export const columsProducts = [
 	},
 	{
 		name: '',
-		selector: row => row.acciones,
+		selector: row => row.editar,
+	},
+	{
+		name: '',
+		selector: row => row.eliminar,
 	},
 ];

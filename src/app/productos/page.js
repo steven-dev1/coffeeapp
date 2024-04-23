@@ -1,137 +1,429 @@
-'use client'
+"use client";
 import Aside from "@/components/aside";
 import Image from "next/image";
 import React from "react";
 import { useState, useEffect } from "react";
-import DataTable from 'react-data-table-component';
+import DataTable from "react-data-table-component";
 import { dataInventory, columsProducts } from "@/utils/tables";
-import { CirclePlus, Hash, ShoppingCart, GanttChart, Layers3, DollarSign, X } from "lucide-react";
+import {
+    CirclePlus,
+    Hash,
+    ShoppingCart,
+    GanttChart,
+    Layers3,
+    DollarSign,
+    X,
+    Trash2,
+} from "lucide-react";
+import Spinner from "@/components/Spinner/Spinner";
 
 export default function Page() {
     const [firstData, setFirstData] = useState([]);
     const [records, setRecords] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [addProduct, setAddProduct] = useState(false)
+    const [addProduct, setAddProduct] = useState(false);
+    const [editProduct, setEditProduct] = useState(false);
+    const [formEdit, setFormEdit] = useState([]);
 
     const [categories, setCategories] = useState([]);
 
+    const eliminarProducto = e => {
+        const confirmar = confirm('¿Estás seguro que quieres eliminar este producto?')
+        if (confirmar) {
+            try {
+                fetch(
+                    `http://localhost:3000/api/v1/products/delete/${e.target.value}`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            Authorization:
+                                "Bearer " +
+                                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7IklkX1VzZXIiOiI2YzBsMTEwNGx2YXh3NGE4IiwiTm9tX1VzZXIiOiJTdGV2ZW4iLCJBcGVfVXNlciI6IkdvbnphbGV6IiwiRW1hX1VzZXIiOiJzdGV2ZW5AZ21haWwuY29tIiwiSWRfUm9sX0ZLIjoxfSwiaWF0IjoxNzEzNzkxNzMxLCJleHAiOjE3MTM4NzgxMzF9.rkpM5m_gAdFT-3DC6hSd9qLEBowQVtqVff-Tbt8lJco",
+                        },
+                    }
+                );
+                location.reload()
+            } catch (e) {
+                console.log(e);
+            }
+        } else {
+            alert('Cancelaste la accion')
+        }
+    };
+
+    const fetchEditar = e => {
+        try {
+            fetch(`http://localhost:3000/api/v1/products/${e.target.value}`)
+                .then(response => response.json())
+                .then(response => {
+                    console.log(response.data);
+                    setFormEdit(response.data);
+                });
+            setEditProduct(true);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     useEffect(() => {
+        setLoading(true)
         fetch("http://localhost:3000/api/v1/products")
             .then(response => response.json())
             .then(data => {
                 console.log(data.data);
                 const productos = data.data.map(producto => ({
-                    'codigo': producto.PROD_COD,
-                    'nombre': producto.PROD_NOM,
-                    'desc': producto.PROD_DESC,
-                    'categoria': producto.Categoria.Nom_Cat,
-                    'precio': producto.PROD_PREC,
-                    'acciones': <div className="p-2">
-                        <a key={producto.PROD_ID} className="bg-sky-500 p-2 rounded-lg text-white" href={`/productos/${producto.Id_Cur}`}>Editar</a>
-                    </div>
+                    codigo: producto.PROD_COD,
+                    nombre: producto.PROD_NOM,
+                    desc: producto.PROD_DESC,
+                    categoria: producto.Categoria.Nom_Cat,
+                    precio: producto.PROD_PREC,
+                    editar: (
+                        <div className="p-2">
+                            <button
+                                key={producto.PROD_ID}
+                                value={producto.PROD_ID}
+                                className="bg-sky-500 p-2 rounded-lg text-white"
+                                href={`/productos/${producto.Id_Cur}`}
+                                onClick={fetchEditar}
+                            >
+                                Editar
+                            </button>
+                        </div>
+                    ),
+                    eliminar: (
+                        <div className="p-2">
+                            <button
+                                key={producto.PROD_ID}
+                                value={producto.PROD_ID}
+                                className="bg-red-500 p-2 rounded-lg text-white"
+                                onClick={eliminarProducto}
+                            >
+                                Eliminar
+                            </button>
+                        </div>
+                    ),
                 }));
-                setRecords(productos)
-                setFirstData(productos)
-                setLoading(false)
+                setRecords(productos);
+                setFirstData(productos);
+                setLoading(false);
             });
 
-        fetch('http://localhost:3000/api/v1/categories')
+        fetch("http://localhost:3000/api/v1/categories")
             .then(response => response.json())
             .then(response => {
-                setCategories(response.data)
-            })
+                setCategories(response.data);
+            });
     }, []);
 
     const paginationComponentOptions = {
-        rowsPerPageText: 'Filas por página',
-        rangeSeparatorText: 'de',
+        rowsPerPageText: "Filas por página",
+        rangeSeparatorText: "de",
         selectAllRowsItem: true,
-        selectAllRowsItemText: 'Todos',
+        selectAllRowsItemText: "Todos",
     };
 
     const showFormAddProduct = () => {
         setAddProduct(true);
-    }
+    };
     const removeFormAddProduct = () => {
         setAddProduct(false);
-    }
+    };
 
+    const showFormEditProduct = () => {
+        setEditProduct(true);
+    };
+    const removeFormEditProduct = () => {
+        setEditProduct(false);
+    };
 
-    const fetchAddProduct = (e) => {
-        e.preventDefault();
-        fetch('http://localhost:3000/api/v1/products/create', {
-            method: 'POST',
+    const fetchAddProduct = e => {
+        fetch("http://localhost:3000/api/v1/products/create", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7IklkX1VzZXIiOiI2c3NheWNsdjhodzJpbiIsIk5vbV9Vc2VyIjoiU3RldmVuIiwiQXBlX1VzZXIiOiJHb256YWxleiIsIkVtYV9Vc2VyIjoic3RldmVuQGdtYWlsLmNvbSIsIklkX1JvbF9GSyI6MX0sImlhdCI6MTcxMzc3MzE3MCwiZXhwIjoxNzEzODU5NTcwfQ.8-SG7iin46K7NHUYcNoPrrvz73109AoF0bc_MIF27RQ'
+                "Content-Type": "application/json",
+                Authorization:
+                    "Bearer " +
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7IklkX1VzZXIiOiI2c3NheWNsdjhodzJpbiIsIk5vbV9Vc2VyIjoiU3RldmVuIiwiQXBlX1VzZXIiOiJHb256YWxleiIsIkVtYV9Vc2VyIjoic3RldmVuQGdtYWlsLmNvbSIsIklkX1JvbF9GSyI6MX0sImlhdCI6MTcxMzc3MzE3MCwiZXhwIjoxNzEzODU5NTcwfQ.8-SG7iin46K7NHUYcNoPrrvz73109AoF0bc_MIF27RQ",
             },
             body: JSON.stringify({
-                'PROD_COD': document.getElementById('PROD_COD').value,
-                'PROD_NOM': document.getElementById('PROD_NOM').value,
-                'PROD_DESC': document.getElementById('PROD_DESC').value,
-                'CAT_ID_FK': document.getElementById('CAT_ID_FK').value,
-                'PROD_PREC': document.getElementById('PROD_PREC').value
-            })
+                PROD_COD: document.getElementById("PROD_COD").value,
+                PROD_NOM: document.getElementById("PROD_NOM").value,
+                PROD_DESC: document.getElementById("PROD_DESC").value,
+                CAT_ID_FK: document.getElementById("CAT_ID_FK").value,
+                PROD_PREC: document.getElementById("PROD_PREC").value,
+            }),
         })
             .then(response => response.json())
             .then(response => {
-                if (response.type === 'success') {
+                if (response.type === "success") {
                     setAddProduct(false);
                 }
-            })
-    }
+            });
+    };
+
+    const fetchEditProduct = e => {
+        fetch(
+            `http://localhost:3000/api/v1/products/update/${e.target.value}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization:
+                        "Bearer " +
+                        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7IklkX1VzZXIiOiI2c3NheWNsdjhodzJpbiIsIk5vbV9Vc2VyIjoiU3RldmVuIiwiQXBlX1VzZXIiOiJHb256YWxleiIsIkVtYV9Vc2VyIjoic3RldmVuQGdtYWlsLmNvbSIsIklkX1JvbF9GSyI6MX0sImlhdCI6MTcxMzc3MzE3MCwiZXhwIjoxNzEzODU5NTcwfQ.8-SG7iin46K7NHUYcNoPrrvz73109AoF0bc_MIF27RQ",
+                },
+                body: JSON.stringify({
+                    PROD_COD: document.getElementById("PROD_COD_edit").value,
+                    PROD_NOM: document.getElementById("PROD_NOM_edit").value,
+                    PROD_DESC: document.getElementById("PROD_DESC_edit").value,
+                    CAT_ID_FK: document.getElementById("CAT_ID_FK_edit").value,
+                    PROD_PREC: document.getElementById("PROD_PREC_edit").value,
+                }),
+            }
+        )
+            .then(response => response.json())
+            .then(response => {
+                if (response.type === "success") {
+                    setEditProduct(false);
+                }
+            });
+    };
 
     return (
-        <main className='flex flex-col md:flex-row overflow-y-hidden'>
+        <main className="flex flex-col md:flex-row overflow-y-hidden">
             <Aside />
-            <div className={`flex ${addProduct ? 'scale-100 opacity-1' : 'scale-0 opacity-0'} transition-all duration-150 justify-center items-center w-screen h-screen absolute z-[1000000000000000] bg-gray-500 bg-opacity-50 backdrop-blur-sm`}>
-                <form onSubmit={fetchAddProduct} className="w-[450px] bg-white h-[450px] rounded-xl p-3 flex flex-col items-center relative">
-                    <div onClick={removeFormAddProduct} className="cursor-pointer absolute top-3 right-5 bg-red-500 rounded-full p-1"><X size={20} color="white" /></div>
-                    <h6 className="text-center text-lg font-black uppercase">Agregar producto</h6>
+            {/* FORM AGREGAR */}
+            <div
+                className={`flex ${
+                    addProduct ? "scale-100 opacity-1" : "scale-0 opacity-0"
+                } transition-all duration-150 justify-center items-center w-screen h-screen absolute z-[1000000000000000] bg-gray-500 bg-opacity-50 backdrop-blur-sm`}
+            >
+                <form
+                    onSubmit={fetchAddProduct}
+                    className="w-[450px] bg-white h-[450px] rounded-xl p-3 flex flex-col items-center relative"
+                >
+                    <div
+                        onClick={removeFormAddProduct}
+                        className="cursor-pointer absolute top-3 right-5 bg-red-500 rounded-full p-1"
+                    >
+                        <X size={20} color="white" />
+                    </div>
+                    <h6 className="text-center text-lg font-black uppercase">
+                        Agregar producto
+                    </h6>
                     <div className="w-full flex flex-col items-center gap-3 justify-center h-full">
                         <div className="flex flex-col justify-center w-4/5">
-                            <label className="text-sm font-semibold flex items-center gap-1"><Hash size={16} /> Código del producto</label>
-                            <input id="PROD_COD" name="PROD_COD" placeholder="26GY7L" type="text" className=" rounded-md py-1 px-2 border border-1 border-gray-500" />
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <Hash size={16} /> Código del producto
+                            </label>
+                            <input
+                                id="PROD_COD"
+                                name="PROD_COD"
+                                placeholder="26GY7L"
+                                type="text"
+                                className=" rounded-md py-1 px-2 border border-1 border-gray-500"
+                            />
                         </div>
                         <div className="flex flex-col justify-center w-4/5">
-                            <label className="text-sm font-semibold flex items-center gap-1"><ShoppingCart size={16} />Nombre del producto</label>
-                            <input id="PROD_NOM" name="PROD_NOM" placeholder="Coca-cola" type="text" className=" rounded-md py-1 px-2 border border-1 border-gray-500" />
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <ShoppingCart size={16} />
+                                Nombre del producto
+                            </label>
+                            <input
+                                id="PROD_NOM"
+                                name="PROD_NOM"
+                                placeholder="Coca-cola"
+                                type="text"
+                                className=" rounded-md py-1 px-2 border border-1 border-gray-500"
+                            />
                         </div>
                         <div className="flex flex-col justify-center w-4/5">
-                            <label className="text-sm font-semibold flex items-center gap-1"><GanttChart size={16} />Descripción del producto</label>
-                            <input id="PROD_DESC" name="PROD_DESC" placeholder="250ml sin azucar" type="text" className="rounded-md py-1 px-2 border border-1 border-gray-500" />
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <GanttChart size={16} />
+                                Descripción del producto
+                            </label>
+                            <input
+                                id="PROD_DESC"
+                                name="PROD_DESC"
+                                placeholder="250ml sin azucar"
+                                type="text"
+                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
+                            />
                         </div>
                         <div className="flex flex-col justify-center w-4/5">
-                            <label className="text-sm font-semibold flex items-center gap-1"><DollarSign size={16} /> Precio del producto</label>
-                            <input id="PROD_PREC" name="PROD_PREC" placeholder="$ 2.500" type="number" className="rounded-md py-1 px-2 border border-1 border-gray-500" />
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <DollarSign size={16} /> Precio del producto
+                            </label>
+                            <input
+                                id="PROD_PREC"
+                                name="PROD_PREC"
+                                placeholder="$ 2.500"
+                                type="number"
+                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
+                            />
                         </div>
                         <div className="flex flex-col justify-center w-4/5">
-                            <label className="text-sm font-semibold flex items-center gap-1"><Layers3 size={16} />Categoría del producto</label>
-                            <select id="CAT_ID_FK" name="CAT_ID_FK" className="rounded-md py-1 px-2 border border-1 border-gray-500">
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <Layers3 size={16} />
+                                Categoría del producto
+                            </label>
+                            <select
+                                id="CAT_ID_FK"
+                                name="CAT_ID_FK"
+                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
+                            >
                                 {categories.map(category => {
-                                    return <option key={category.Id_Cat} value={category.Id_Cat}>{category.Nom_Cat}</option>
+                                    return (
+                                        <option
+                                            key={category.Id_Cat}
+                                            value={category.Id_Cat}
+                                        >
+                                            {category.Nom_Cat}
+                                        </option>
+                                    );
                                 })}
                             </select>
                         </div>
                     </div>
-                    <button type="submit" className="bg-transparent py-2 px-3 rounded-xl text-black font-semibold border-2 border-black transition-all duration-150 hover:text-white hover:bg-black text-sm">Aceptar</button>
+                    <button
+                        type="submit"
+                        className="bg-transparent py-2 px-3 rounded-xl text-black font-semibold border-2 border-black transition-all duration-150 hover:text-white hover:bg-black text-sm"
+                    >
+                        Aceptar
+                    </button>
+                </form>
+            </div>
+            {/* FORM EDITAR */}
+            <div
+                className={`flex ${
+                    editProduct ? "scale-100 opacity-1" : "scale-0 opacity-0"
+                } transition-all duration-150 justify-center items-center w-screen h-screen absolute z-[1000000000000000] bg-gray-500 bg-opacity-50 backdrop-blur-sm`}
+            >
+                <form className="w-[450px] bg-white h-[450px] rounded-xl p-3 flex flex-col items-center relative">
+                    <div
+                        onClick={removeFormEditProduct}
+                        className="cursor-pointer absolute top-3 right-5 bg-red-500 rounded-full p-1"
+                    >
+                        <X size={20} color="white" />
+                    </div>
+                    <h6 className="text-center text-lg font-black uppercase">
+                        Editar producto
+                    </h6>
+                    <div className="w-full flex flex-col items-center gap-3 justify-center h-full">
+                        <div className="flex flex-col justify-center w-4/5">
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <Hash size={16} /> Código del producto
+                            </label>
+                            <input
+                                id="PROD_COD_edit"
+                                name="PROD_COD"
+                                placeholder="26GY7L"
+                                type="text"
+                                className=" rounded-md py-1 px-2 border border-1 border-gray-500"
+                                defaultValue={formEdit.PROD_COD}
+                            />
+                        </div>
+                        <div className="flex flex-col justify-center w-4/5">
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <ShoppingCart size={16} />
+                                Nombre del producto
+                            </label>
+                            <input
+                                id="PROD_NOM_edit"
+                                name="PROD_NOM"
+                                placeholder="Coca-cola"
+                                type="text"
+                                className=" rounded-md py-1 px-2 border border-1 border-gray-500"
+                                defaultValue={formEdit.PROD_NOM}
+                            />
+                        </div>
+                        <div className="flex flex-col justify-center w-4/5">
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <GanttChart size={16} />
+                                Descripción del producto
+                            </label>
+                            <input
+                                id="PROD_DESC_edit"
+                                name="PROD_DESC"
+                                placeholder="250ml sin azucar"
+                                type="text"
+                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
+                                defaultValue={formEdit.PROD_DESC}
+                            />
+                        </div>
+                        <div className="flex flex-col justify-center w-4/5">
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <DollarSign size={16} /> Precio del producto
+                            </label>
+                            <input
+                                id="PROD_PREC_edit"
+                                name="PROD_PREC"
+                                placeholder="$ 2.500"
+                                type="number"
+                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
+                                defaultValue={formEdit.PROD_PREC}
+                            />
+                        </div>
+                        <div className="flex flex-col justify-center w-4/5">
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <Layers3 size={16} />
+                                Categoría del producto
+                            </label>
+                            <select
+                                id="CAT_ID_FK_edit"
+                                name="CAT_ID_FK"
+                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
+                                // defaultValue={formEdit.CAT_ID_FK}
+                            >
+                                {categories.map(category => {
+                                    return (
+                                        <option
+                                            key={category.Id_Cat}
+                                            value={category.Id_Cat}
+                                        >
+                                            {category.Nom_Cat}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
+                    </div>
+                    <button
+                        value={formEdit.PROD_ID}
+                        type="submit"
+                        className="bg-transparent py-2 px-3 rounded-xl text-black font-semibold border-2 border-black transition-all duration-150 hover:text-white hover:bg-black text-sm"
+                        onClick={fetchEditProduct}
+                    >
+                        Aceptar
+                    </button>
                 </form>
             </div>
             <div className="w-full p-6 ml-0 md:ml-[150px] 2xl:ml-[200px] mt-[80px] md:mt-0">
                 <div className="overflow-auto">
                     <div className="flex items-center justify-between w-full flex-col sm:flex-row gap-4">
                         <h3 className="font-semibold text-xl">Productos</h3>
-                        <button onClick={showFormAddProduct} className="bg-[#00BF9C] text-white p-2 rounded-md flex items-center gap-2 text-sm"><CirclePlus /> Agregar producto</button>
+                        <button
+                            onClick={showFormAddProduct}
+                            className="bg-[#00BF9C] text-white p-2 rounded-md flex items-center gap-2 text-sm"
+                        >
+                            <CirclePlus /> Agregar producto
+                        </button>
                     </div>
                     <hr className="mt-4" />
                     <div className="my-4 w-full max-h-screen flex flex-col justify-between gap-4 overflow-auto">
                         <div className="w-full bg-gray-100 rounded-lg p-2 px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
                             <div className="flex gap-2 items-center">
                                 <label className="text-sm">Buscar:</label>
-                                <input type="text" placeholder="Coca-cola 400ml" className="text-sm border border-1 border-gray-300 rounded-lg p-2" />
+                                <input
+                                    type="text"
+                                    placeholder="Coca-cola 400ml"
+                                    className="text-sm border border-1 border-gray-300 rounded-lg p-2"
+                                />
                             </div>
                             <div>
-                                <p className="text-sm">Resultados encontrados: {records.length}</p>
+                                <p className="text-sm">
+                                    Resultados encontrados: {records.length}
+                                </p>
                             </div>
                         </div>
                         <div className="bg-gray-100 p-2 rounded-lg overflow-auto flex-1">
@@ -140,12 +432,16 @@ export default function Page() {
                                 columns={columsProducts}
                                 data={records}
                                 pagination
-                                paginationComponentOptions={paginationComponentOptions}
+                                paginationComponentOptions={
+                                    paginationComponentOptions
+                                }
+                                progressPending={loading}
+                                progressComponent={<Spinner />}
                             />
                         </div>
                     </div>
                 </div>
             </div>
         </main>
-    )
+    );
 }

@@ -27,7 +27,7 @@ function Aside() {
                         height={50}
                     />
                 </div>
-                <nav className={`${menu ? "w-2/4 md:w-full p-0" : "w-0 md:w-full p-0"} md:w-full flex flex-col justify-between absolute top-0 pt-[96px] z-50 left-0 md:relative transition-all duration-150 backdrop-blur-xl mx-auto md:block  md:p-0 md:bg-transparent h-screen md:h-auto`}>
+                <nav className={`${menu ? "w-2/4 md:w-full p-0" : "w-0 md:w-full p-0"} md:w-full flex flex-col justify-between absolute top-0 pt-[96px] z-50 left-0 md:relative transition-all duration-150 bg-white mx-auto md:block  md:p-0 md:bg-transparent h-screen md:h-auto`}>
                     <ul className={`${menu ? "flex" : "hidden md:flex"} flex-col gap-4 list-none md:w-full`}>
                         <li className="rounded-lg transition-all duration-150 cursor-pointer">
                             <a
