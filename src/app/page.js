@@ -64,7 +64,7 @@ function Page() {
     return (
         <main className="flex flex-col md:flex-row overflow-y-hidden">
             <Aside />
-            <div className="w-full p-6 ml-0 md:ml-[150px] 2xl:ml-[200px] mt-[80px] md:mt-0">
+            <div className="w-full p-6 ml-0 md:ml-[200px] 2xl:ml-[200px] mt-[80px] md:mt-0">
                 <div>
                     <div className="flex items-center justify-between px-4">
                         <h3 className="font-semibold text-xl">Inicio</h3>

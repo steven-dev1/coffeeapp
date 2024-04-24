@@ -85,8 +85,8 @@ function Page() {
 
   return (
     <main className='w-screen h-screen p-0 m-0 flex justify-center items-center bg-gray-200 overflow-hidden'>
-      <div className='w-[400px] h-[400px] rounded-full bg-[#00BF9C] fixed bottom-[-9em] right-[-7em]'></div>
-      <div className='w-[400px] h-[400px] rounded-full bg-[#00BF9C] fixed top-[-9em] left-[-7em]'></div>
+      <div className='w-[400px] h-[400px] rounded-full bg-sky-500 fixed bottom-[-9em] right-[-7em]'></div>
+      <div className='w-[400px] h-[400px] rounded-full bg-sky-500 fixed top-[-9em] left-[-7em]'></div>
       <form className={`absolute m-4 ${form ? "w-auto p-4 z-10" : "min-w-0 w-0 p-0 z-0"} transition-all duration-500 min-w-[550px] min-h-[550px] max-h-[550px] overflow-hidden bg-gray-100 rounded-xl flex flex-col items-center justify-around gap-3 mx-auto`} onSubmit={authLogin}>
         <div className={`${form ? "opacity-1" : "opacity-0"} flex flex-col items-center justify-center w-[90%]`}>
           <h1 className='font-bold text-3xl'>LOGIN</h1>
@@ -106,7 +106,7 @@ function Page() {
             <a href="/auth/register" className='underline'>¿Olvidaste la contraseña?</a>
             <div className='flex gap-1'>
               <p>¿No tienes cuenta?</p>
-              <a className='text-[#00BF9C] underline font-semibold cursor-pointer' onClick={showRegister}>Registrate</a>
+              <a className='text-sky-500 underline font-semibold cursor-pointer' onClick={showRegister}>Registrate</a>
             </div>
           </div>
         </section>
@@ -173,7 +173,7 @@ function Page() {
           </div>
           <div className="flex items-center justify-center gap-1 mt-2 text-sm">
             <p>¿Ya tienes cuenta?</p>
-            <a className='text-[#00BF9C] underline font-semibold cursor-pointer' onClick={showLogin}>Iniciar sesión</a>
+            <a className='text-sky-500 underline font-semibold cursor-pointer' onClick={showLogin}>Iniciar sesión</a>
           </div>
         </section>
         <button type="submit" className={`${form ? "opacity-0" : "opacity-1"} flex font-semibold transition-all duration-150 border-2 border-black text-black hover:bg-black hover:text-white py-2 px-4 rounded-full`}>

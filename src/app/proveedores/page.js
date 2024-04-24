@@ -4,7 +4,7 @@ import Image from "next/image";
 import React from "react";
 import { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
-import { dataInventory, columsProducts } from "@/utils/tables";
+import { columsProveedores } from "@/utils/tables";
 import {
     CirclePlus,
     Hash,
@@ -14,6 +14,7 @@ import {
     DollarSign,
     X,
     Trash2,
+    Truck,
 } from "lucide-react";
 import Spinner from "@/components/Spinner/Spinner";
 
@@ -25,6 +26,8 @@ export default function Page() {
     const [editProduct, setEditProduct] = useState(false);
     const [formEdit, setFormEdit] = useState([]);
 
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7IklkX1VzZXIiOiI2c3M0bGNsdmRjbXY1ZSIsIk5vbV9Vc2VyIjoiU3RldmVuIiwiQXBlX1VzZXIiOiJHb256YWxleiIsIkVtYV9Vc2VyIjoic3RldmVuQGdtYWlsLmNvbSIsIklkX1JvbF9GSyI6MX0sImlhdCI6MTcxMzkzODgxNywiZXhwIjoxNzE0MDI1MjE3fQ.pp7D5fH0ekDcT_zOdkMCmSXJkRrU98fmP2ExHudVSvM"
+
     const [categories, setCategories] = useState([]);
 
     const eliminarProducto = e => {
@@ -32,13 +35,12 @@ export default function Page() {
         if (confirmar) {
             try {
                 fetch(
-                    `http://localhost:3000/api/v1/products/delete/${e.target.value}`,
+                    `http://localhost:3000/api/v1/providers/delete/${e.target.value}`,
                     {
                         method: "DELETE",
                         headers: {
                             Authorization:
-                                "Bearer " +
-                                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7IklkX1VzZXIiOiI2YzBsMTEwNGx2YXh3NGE4IiwiTm9tX1VzZXIiOiJTdGV2ZW4iLCJBcGVfVXNlciI6IkdvbnphbGV6IiwiRW1hX1VzZXIiOiJzdGV2ZW5AZ21haWwuY29tIiwiSWRfUm9sX0ZLIjoxfSwiaWF0IjoxNzEzNzkxNzMxLCJleHAiOjE3MTM4NzgxMzF9.rkpM5m_gAdFT-3DC6hSd9qLEBowQVtqVff-Tbt8lJco",
+                                "Bearer " + token,
                         },
                     }
                 );
@@ -53,7 +55,12 @@ export default function Page() {
 
     const fetchEditar = e => {
         try {
-            fetch(`http://localhost:3000/api/v1/products/${e.target.value}`)
+            fetch(`http://localhost:3000/api/v1/providers/${e.target.value}`,{
+                method: 'GET',
+                headers: {
+                    Authorization: 'Bearer '+ token
+                }
+            })
                 .then(response => response.json())
                 .then(response => {
                     console.log(response.data);
@@ -67,23 +74,25 @@ export default function Page() {
 
     useEffect(() => {
         setLoading(true)
-        fetch("http://localhost:3000/api/v1/products")
+        fetch("http://localhost:3000/api/v1/providers", {
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 console.log(data.data);
-                const productos = data.data.map(producto => ({
-                    codigo: producto.PROD_COD,
-                    nombre: producto.PROD_NOM,
-                    desc: producto.PROD_DESC,
-                    categoria: producto.categoria.Nom_Cat,
-                    precio: producto.PROD_PREC,
+                const productos = data.data.map(proveedor => ({
+                    nombre: proveedor.PROV_NOM,
+                    contacto: proveedor.PROV_CONTACTO == null ? "No hay contacto" : proveedor.PROV_CONTACTO,
+                    estado: proveedor.PROV_EST == "A" ? "Activo" : "Inactivo",
                     editar: (
                         <div className="p-2">
                             <button
-                                key={producto.PROD_ID}
-                                value={producto.PROD_ID}
+                                key={proveedor.PROV_ID}
+                                value={proveedor.PROV_ID}
                                 className="bg-sky-500 p-2 rounded-lg text-white"
-                                href={`/productos/${producto.Id_Cur}`}
                                 onClick={fetchEditar}
                             >
                                 Editar
@@ -93,8 +102,8 @@ export default function Page() {
                     eliminar: (
                         <div className="p-2">
                             <button
-                                key={producto.PROD_ID}
-                                value={producto.PROD_ID}
+                                key={proveedor.PROV_ID}
+                                value={proveedor.PROV_ID}
                                 className="bg-red-500 p-2 rounded-lg text-white"
                                 onClick={eliminarProducto}
                             >
@@ -106,12 +115,6 @@ export default function Page() {
                 setRecords(productos);
                 setFirstData(productos);
                 setLoading(false);
-            });
-
-        fetch("http://localhost:3000/api/v1/categories")
-            .then(response => response.json())
-            .then(response => {
-                setCategories(response.data);
             });
     }, []);
 
@@ -136,21 +139,18 @@ export default function Page() {
         setEditProduct(false);
     };
 
-    const fetchAddProduct = e => {
-        fetch("http://localhost:3000/api/v1/products/create", {
+    const fetchAddProveedor = e => {
+        e.preventDefault();
+        fetch("http://localhost:3000/api/v1/providers/create", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Authorization:
-                    "Bearer " +
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7IklkX1VzZXIiOiI2c3M3YmNsdmJsMzQyZSIsIk5vbV9Vc2VyIjoiU3RldmVuIiwiQXBlX1VzZXIiOiJHb256YWxleiIsIkVtYV9Vc2VyIjoic3RldmVuQGdtYWlsLmNvbSIsIklkX1JvbF9GSyI6MX0sImlhdCI6MTcxMzkxMTgxMywiZXhwIjoxNzEzOTk4MjEzfQ.DrY7VxTmq-xn9flmQVkoOUWYLeooC4p2Cb-2PzeEPAQ",
+                    "Bearer " + token,
             },
             body: JSON.stringify({
-                PROD_COD: document.getElementById("PROD_COD").value,
-                PROD_NOM: document.getElementById("PROD_NOM").value,
-                PROD_DESC: document.getElementById("PROD_DESC").value,
-                CAT_ID_FK: document.getElementById("CAT_ID_FK").value,
-                PROD_PREC: document.getElementById("PROD_PREC").value,
+                PROV_NOM: document.getElementById("PROV_NOM").value,
+                PROV_CONTACTO: document.getElementById("PROV_CONTACTO").value,
             }),
         })
             .then(response => response.json())
@@ -165,21 +165,17 @@ export default function Page() {
     const fetchEditProduct = e => {
         e.preventDefault();
         fetch(
-            `http://localhost:3000/api/v1/products/update/${e.target.value}`,
+            `http://localhost:3000/api/v1/providers/update/${e.target.value}`,
             {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization:
-                        "Bearer " +
-                        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7IklkX1VzZXIiOiI2c3M3YmNsdmJsMzQyZSIsIk5vbV9Vc2VyIjoiU3RldmVuIiwiQXBlX1VzZXIiOiJHb256YWxleiIsIkVtYV9Vc2VyIjoic3RldmVuQGdtYWlsLmNvbSIsIklkX1JvbF9GSyI6MX0sImlhdCI6MTcxMzkxMTgxMywiZXhwIjoxNzEzOTk4MjEzfQ.DrY7VxTmq-xn9flmQVkoOUWYLeooC4p2Cb-2PzeEPAQ",
+                        "Bearer " + token,
                 },
                 body: JSON.stringify({
-                    PROD_COD: document.getElementById("PROD_COD_edit").value,
-                    PROD_NOM: document.getElementById("PROD_NOM_edit").value,
-                    PROD_DESC: document.getElementById("PROD_DESC_edit").value,
-                    CAT_ID_FK: document.getElementById("CAT_ID_FK_edit").value,
-                    PROD_PREC: document.getElementById("PROD_PREC_edit").value,
+                    PROV_NOM: document.getElementById("PROV_NOM_edit").value,
+                    PROV_CONTACTO: document.getElementById("PROV_CONTACTO_edit").value,
                 }),
             }
         )
@@ -208,7 +204,7 @@ export default function Page() {
                     } transition-all duration-150 justify-center items-center w-screen h-screen absolute z-[1000000000000000] bg-gray-500 bg-opacity-50 backdrop-blur-sm`}
             >
                 <form
-                    onSubmit={fetchAddProduct}
+                    onSubmit={fetchAddProveedor}
                     className="w-[450px] bg-white h-[450px] rounded-xl p-3 flex flex-col items-center relative"
                 >
                     <div
@@ -218,29 +214,16 @@ export default function Page() {
                         <X size={20} color="white" />
                     </div>
                     <h6 className="text-center text-lg font-black uppercase">
-                        Agregar producto
+                        Añadir proveedor
                     </h6>
                     <div className="w-full flex flex-col items-center gap-3 justify-center h-full">
                         <div className="flex flex-col justify-center w-4/5">
                             <label className="text-sm font-semibold flex items-center gap-1">
-                                <Hash size={16} /> Código del producto
+                                <Truck size={16} /> Nombre del proveedor
                             </label>
                             <input
-                                id="PROD_COD"
-                                name="PROD_COD"
-                                placeholder="26GY7L"
-                                type="text"
-                                className=" rounded-md py-1 px-2 border border-1 border-gray-500"
-                            />
-                        </div>
-                        <div className="flex flex-col justify-center w-4/5">
-                            <label className="text-sm font-semibold flex items-center gap-1">
-                                <ShoppingCart size={16} />
-                                Nombre del producto
-                            </label>
-                            <input
-                                id="PROD_NOM"
-                                name="PROD_NOM"
+                                id="PROV_NOM"
+                                name="PROV_NOM"
                                 placeholder="Coca-cola"
                                 type="text"
                                 className=" rounded-md py-1 px-2 border border-1 border-gray-500"
@@ -248,50 +231,16 @@ export default function Page() {
                         </div>
                         <div className="flex flex-col justify-center w-4/5">
                             <label className="text-sm font-semibold flex items-center gap-1">
-                                <GanttChart size={16} />
-                                Descripción del producto
+                                <Truck size={16} />
+                                Contacto
                             </label>
                             <input
-                                id="PROD_DESC"
-                                name="PROD_DESC"
-                                placeholder="250ml sin azucar"
+                                id="PROV_CONTACTO"
+                                name="PROV_CONTACTO"
+                                placeholder="cocacola@gmail.com"
                                 type="text"
-                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
+                                className=" rounded-md py-1 px-2 border border-1 border-gray-500"
                             />
-                        </div>
-                        <div className="flex flex-col justify-center w-4/5">
-                            <label className="text-sm font-semibold flex items-center gap-1">
-                                <DollarSign size={16} /> Precio del producto
-                            </label>
-                            <input
-                                id="PROD_PREC"
-                                name="PROD_PREC"
-                                placeholder="$ 2.500"
-                                type="number"
-                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
-                            />
-                        </div>
-                        <div className="flex flex-col justify-center w-4/5">
-                            <label className="text-sm font-semibold flex items-center gap-1">
-                                <Layers3 size={16} />
-                                Categoría del producto
-                            </label>
-                            <select
-                                id="CAT_ID_FK"
-                                name="CAT_ID_FK"
-                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
-                            >
-                                {categories.map(category => {
-                                    return (
-                                        <option
-                                            key={category.Id_Cat}
-                                            value={category.Id_Cat}
-                                        >
-                                            {category.Nom_Cat}
-                                        </option>
-                                    );
-                                })}
-                            </select>
                         </div>
                     </div>
                     <button
@@ -315,89 +264,39 @@ export default function Page() {
                         <X size={20} color="white" />
                     </div>
                     <h6 className="text-center text-lg font-black uppercase">
-                        Editar producto
+                        Editar proveedor
                     </h6>
                     <div className="w-full flex flex-col items-center gap-3 justify-center h-full">
                         <div className="flex flex-col justify-center w-4/5">
                             <label className="text-sm font-semibold flex items-center gap-1">
-                                <Hash size={16} /> Código del producto
+                                <Truck size={16} /> Nombre del proveedor
                             </label>
                             <input
-                                id="PROD_COD_edit"
-                                name="PROD_COD"
-                                placeholder="26GY7L"
+                                id="PROV_NOM_edit"
+                                name="PROV_NOM_edit"
+                                placeholder="Alkosto"
                                 type="text"
                                 className=" rounded-md py-1 px-2 border border-1 border-gray-500"
-                                defaultValue={formEdit.PROD_COD}
+                                defaultValue={formEdit.PROV_NOM}
                             />
                         </div>
                         <div className="flex flex-col justify-center w-4/5">
                             <label className="text-sm font-semibold flex items-center gap-1">
-                                <ShoppingCart size={16} />
-                                Nombre del producto
+                                <Truck size={16} />
+                                Contacto
                             </label>
                             <input
-                                id="PROD_NOM_edit"
-                                name="PROD_NOM"
-                                placeholder="Coca-cola"
+                                id="PROV_CONTACTO_edit"
+                                name="PROV_CONTACTO_edit"
+                                placeholder="alkosto@alkosto.com"
                                 type="text"
                                 className=" rounded-md py-1 px-2 border border-1 border-gray-500"
-                                defaultValue={formEdit.PROD_NOM}
+                                defaultValue={formEdit.PROV_CONTACTO}
                             />
-                        </div>
-                        <div className="flex flex-col justify-center w-4/5">
-                            <label className="text-sm font-semibold flex items-center gap-1">
-                                <GanttChart size={16} />
-                                Descripción del producto
-                            </label>
-                            <input
-                                id="PROD_DESC_edit"
-                                name="PROD_DESC"
-                                placeholder="250ml sin azucar"
-                                type="text"
-                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
-                                defaultValue={formEdit.PROD_DESC}
-                            />
-                        </div>
-                        <div className="flex flex-col justify-center w-4/5">
-                            <label className="text-sm font-semibold flex items-center gap-1">
-                                <DollarSign size={16} /> Precio del producto
-                            </label>
-                            <input
-                                id="PROD_PREC_edit"
-                                name="PROD_PREC"
-                                placeholder="$ 2.500"
-                                type="number"
-                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
-                                defaultValue={formEdit.PROD_PREC}
-                            />
-                        </div>
-                        <div className="flex flex-col justify-center w-4/5">
-                            <label className="text-sm font-semibold flex items-center gap-1">
-                                <Layers3 size={16} />
-                                Categoría del producto
-                            </label>
-                            <select
-                                id="CAT_ID_FK_edit"
-                                name="CAT_ID_FK"
-                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
-                            // defaultValue={formEdit.CAT_ID_FK}
-                            >
-                                {categories.map(category => {
-                                    return (
-                                        <option
-                                            key={category.Id_Cat}
-                                            value={category.Id_Cat}
-                                        >
-                                            {category.Nom_Cat}
-                                        </option>
-                                    );
-                                })}
-                            </select>
                         </div>
                     </div>
                     <button
-                        value={formEdit.PROD_ID}
+                        value={formEdit.PROV_ID}
                         type="submit"
                         className="bg-transparent py-2 px-3 rounded-xl text-black font-semibold border-2 border-black transition-all duration-150 hover:text-white hover:bg-black text-sm"
                         onClick={fetchEditProduct}
@@ -409,12 +308,12 @@ export default function Page() {
             <div className="w-full p-6 ml-0 lg:ml-[200px] 2xl:ml-[200px] mt-[80px] lg:mt-0">
                 <div className="overflow-auto">
                     <div className="flex items-center justify-between w-full flex-col sm:flex-row gap-4">
-                        <h3 className="font-semibold text-xl">Productos</h3>
+                        <h3 className="font-semibold text-xl">Proveedores</h3>
                         <button
                             onClick={showFormAddProduct}
                             className="bg-sky-500 text-white p-2 rounded-md flex items-center gap-2 text-sm"
                         >
-                            <CirclePlus /> Agregar producto
+                            <CirclePlus /> Añadir proveedor
                         </button>
                     </div>
                     <hr className="mt-4" />
@@ -424,7 +323,7 @@ export default function Page() {
                                 <label className="text-sm">Buscar:</label>
                                 <input
                                     type="text"
-                                    placeholder="Coca-cola 400ml"
+                                    placeholder="Alkosto, Olimpica, Pepsi..."
                                     className="text-sm border border-1 border-gray-300 rounded-lg p-2"
                                     onChange={handleChange}
                                 />
@@ -438,7 +337,7 @@ export default function Page() {
                         <div className="bg-gray-100 p-2 rounded-lg overflow-auto flex flex-col justify-center items-center w-full">
                             {/* <h3 className="font-bold text-lg m-2">Productos</h3> */}
                             <DataTable
-                                columns={columsProducts}
+                                columns={columsProveedores}
                                 data={records}
                                 pagination
                                 paginationComponentOptions={
@@ -451,16 +350,10 @@ export default function Page() {
                                         style: {
                                             backgroundColor: "#0EA5E9",
                                             color: "#fff",
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
                                         },
                                     },
                                     cells: {
                                         style: {
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
                                             width: "100%",
                                         },
                                     },

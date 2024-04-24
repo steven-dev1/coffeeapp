@@ -1,7 +1,7 @@
 'use client'
 import { useState, } from "react";
 import Link from "next/link";
-import { Menu, X, ArrowRightFromLine, Home, Archive, CircleDollarSign, GalleryVerticalEnd, ShoppingCart } from "lucide-react";
+import { Menu, X, Bolt, Home, ScanBarcode, Archive, CircleDollarSign, GalleryVerticalEnd, ShoppingCart, Truck } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
@@ -13,12 +13,12 @@ function Aside() {
         setMenu(!menu);
     };
     return (
-        <aside className={`${menu ? "h-auto md:h-screen md:max-h-screen max-h-[100px] max-w-full w-full md:max-w-[150px] md:min-w-[150px] 2xl:min-w-[200px] 2xl:max-w-[200px]" : "max-w-full w-full md:min-w-[90px] md:max-w-[90px] h-auto max-h-[100px] md:h-screen md:max-h-screen 2xl:max-w-[110px] 2xl:min-w-[110px]"} z-[100000] fixed left-0 bg-gray-100 md:flex md:flex-col flex-row justify-evenly md:justify-between items-center p-2 transition-all duration-150`}>
-            <div className="flex flex-row md:flex-col justify-between md:justify-center items-center">
+        <aside className={`${menu ? "h-auto lg:h-screen lg:max-h-screen max-h-[100px] max-w-full w-full lg:max-w-[200px] lg:min-w-[200px] 2xl:min-w-[200px] 2xl:max-w-[200px]" : "max-w-full w-full lg:min-w-[90px] lg:max-w-[90px] h-auto max-h-[100px] lg:h-screen md:max-h-screen 2xl:max-w-[110px] 2xl:min-w-[110px]"} z-[100000] fixed left-0 bg-sky-500 lg:flex lg:flex-col flex-row justify-evenly md:justify-between items-center py-2 transition-all duration-150`}>
+            <div className="flex flex-row lg:flex-col justify-between lg:justify-center items-center w-full">
                 <div className="p-2 cursor-pointer z-[100]" onClick={toggleMenu}>
-                    {menu ? <X /> : <Menu />}
+                    <div className="p-1 bg-sky-600 rounded-full">{menu ? <X color="white" /> : <Menu color="white" />}</div>
                 </div>
-                <div className="px-4 py-1 md:p-4 overflow-hidden whitespace-nowrap flex flex-col items-center z-[100]">
+                <div className="px-4 py-1 lg:p-4 overflow-hidden whitespace-nowrap flex flex-col items-center z-[100]">
                     <Image
                         className="img-aside"
                         src="/logo-coffeesena.png"
@@ -27,92 +27,75 @@ function Aside() {
                         height={50}
                     />
                 </div>
-                <nav className={`${menu ? "w-2/4 md:w-full p-0" : "w-0 md:w-full p-0"} md:w-full flex flex-col justify-between absolute top-0 pt-[96px] z-50 left-0 md:relative transition-all duration-150 bg-white mx-auto md:block  md:p-0 md:bg-transparent h-screen md:h-auto`}>
-                    <ul className={`${menu ? "flex" : "hidden md:flex"} flex-col gap-4 list-none md:w-full`}>
-                        <li className="rounded-lg transition-all duration-150 cursor-pointer">
+                <nav className={`${menu ? "w-2/4 lg:w-full p-0" : "w-0 lg:w-full p-0"} flex flex-col justify-between absolute top-0 pt-[96px] z-50 left-0 lg:relative transition-all duration-150 bg-sky-500 mx-auto lg:block  lg:p-0 lg:bg-transparent h-screen lg:h-auto`}>
+                    <ul className={`${menu ? "flex" : "hidden lg:flex"} flex-col gap-2 list-none w-full justify-between h-full`}>
+                        <li className="transition-all duration-150 cursor-pointer">
                             <a
-                                className={`flex ${menu ? 'justify-start' : 'justify-center'} hover:bg-gray-200 items-center gap-1 text-black rounded-xl no-underline p-3 text-sm 2xl:text-base ${pathname == "/" ? "bg-white hover:bg-white" : "bg-transparent text-gray-500"
+                                className={`flex ${menu ? 'justify-start' : 'justify-center'} transition-all duration-100 items-center gap-1 text-black no-underline py-3 px-6 text-sm 2xl:text-base ${pathname == "/" ? "bg-white hover:bg-white" : "hover:bg-sky-600 text-white"
                                     }`}
                                 href={"/"}
                             >
-                                <div><Home size={20} color={pathname == '/' ? "#00BF9C" : '#6B7280'} /></div><div className={menu ? "block font-semibold" : "hidden"}>Inicio</div>
+                                <div><Home size={20} color={pathname == '/' ? "#0ea5e9" : 'white'} /></div><div className={menu ? "block font-semibold" : "hidden"}>Inicio</div>
                             </a>
                         </li>
                         <li className="rounded-lg transition-all duration-150 cursor-pointer">
                             <a
-                                className={`flex ${menu ? 'justify-start' : 'justify-center'} hover:bg-gray-200 items-center gap-1 text-black rounded-xl no-underline p-3 text-sm 2xl:text-base ${pathname == "/productos" ? "bg-white hover:bg-white" : "bg-transparent text-gray-500"
+                                className={`flex ${menu ? 'justify-start' : 'justify-center'} transition-all duration-100 items-center gap-1 text-black no-underline py-3 px-6 text-sm 2xl:text-base ${pathname == "/productos" ? "bg-white hover:bg-white" : "hover:bg-sky-600 text-white"
                                     }`}
                                 href={"/productos"}
                             >
-                                <div><ShoppingCart size={20} color={pathname == '/productos' ? "#00BF9C" : '#6B7280'} /></div><div className={menu ? "block font-semibold" : "hidden"}>Productos</div>
+                                <div><ShoppingCart size={20} color={pathname == '/productos' ? "#0ea5e9" : 'white'} /></div><div className={menu ? "block font-semibold" : "hidden"}>Productos</div>
+                            </a>
+                        </li>
+                        <li className="rounded-lg transition-all duration-150 cursor-pointer">
+                            <a
+                                className={`flex ${menu ? 'justify-start' : 'justify-center'} transition-all duration-100 items-center gap-1 text-black no-underline py-3 px-6 text-sm 2xl:text-base ${pathname == "/proveedores" ? "bg-white hover:bg-white" : "hover:bg-sky-600 text-white"
+                                    }`}
+                                href={"/proveedores"}
+                            >
+                                <div><Truck size={20} color={pathname == '/proveedores' ? "#0ea5e9" : 'white'} /></div><div className={menu ? "block font-semibold" : "hidden"}>Proveedores</div>
                             </a>
                         </li>
                         <li className="li-nav-aside">
                             <a
-                                className={`flex ${menu ? 'justify-start' : 'justify-center'} hover:bg-gray-200 items-start gap-1 text-black rounded-xl no-underline p-3 text-sm 2xl:text-base ${pathname == "/inventario" ? "bg-white hover:bg-white" : "bg-transparent text-gray-500"
+                                className={`flex ${menu ? 'justify-start' : 'justify-center'} transition-all duration-100 items-start gap-1 text-black no-underline py-3 px-6 text-sm 2xl:text-base ${pathname == "/inventario" ? "bg-white hover:bg-white" : "hover:bg-sky-600 text-white"
                                     }`}
                                 href={"/inventario"}
                             >
-                                <div><Archive size={20} color={pathname == '/inventario' ? "#00BF9C" : '#6B7280'} /></div><div className={menu ? "block font-semibold" : "hidden"}>Inventario</div>
+                                <div><Archive size={20} color={pathname == '/inventario' ? "#0ea5e9" : 'white'} /></div><div className={menu ? "block font-semibold" : "hidden"}>Inventario</div>
+                            </a>
+                        </li>
+                        <li className="li-nav-aside">
+                            <a className={`flex ${menu ? 'justify-start' : 'justify-center'} transition-all duration-100 items-center gap-1 text-black no-underline py-3 px-6 text-sm 2xl:text-base ${pathname == "/historial" ? "bg-white hover:bg-white" : "hover:bg-sky-600 text-white"
+                                }`}
+                                href={"/historial"}
+                            >
+                                <div><ScanBarcode size={20} color={pathname == '/historial' ? "#0ea5e9" : 'white'} /></div><div className={menu ? "block font-semibold" : "hidden"}>Compras</div>
                             </a>
                         </li>
                         <li className="li-nav-aside">
                             <a
-                                className={`flex ${menu ? 'justify-start' : 'justify-center'} hover:bg-gray-200 items-center gap-1 text-black rounded-xl no-underline p-3 text-sm 2xl:text-base ${pathname == "/ventas" ? "bg-white hover:bg-white" : "bg-transparent text-gray-500"
+                                className={`flex ${menu ? 'justify-start' : 'justify-center'} transition-all duration-100 items-center gap-1 text-black no-underline py-3 px-6 text-sm 2xl:text-base ${pathname == "/ventas" ? "bg-white hover:bg-white" : "hover:bg-sky-600 text-white"
                                     }`}
                                 href={"/ventas"}
                             >
-                                <div><CircleDollarSign size={20} color={pathname == '/ventas' ? "#00BF9C" : '#6B7280'} /></div><div className={menu ? "block font-semibold" : "hidden"}>Venta</div>
+                                <div><CircleDollarSign size={20} color={pathname == '/ventas' ? "#0ea5e9" : 'white'} /></div><div className={menu ? "block font-semibold" : "hidden"}>Venta</div>
                             </a>
                         </li>
                         <li className="li-nav-aside">
-                            <a className={`flex ${menu ? 'justify-start' : 'justify-center'} hover:bg-gray-200 items-center gap-1 text-black rounded-xl no-underline p-3 text-sm 2xl:text-base ${pathname == "/historial" ? "bg-white hover:bg-white" : "bg-transparent text-gray-500"
-                                }`}
-                                href={"/historial"}
+                            <a
+                                className={`flex ${menu ? 'justify-start' : 'justify-center'} transition-all duration-100 items-center gap-1 text-black no-underline py-3 px-6 text-sm 2xl:text-base ${pathname == "/ventas" ? "bg-white hover:bg-white" : "hover:bg-sky-600 text-white"
+                                    }`}
+                                href={"/ventas"}
                             >
-                                <div><GalleryVerticalEnd size={20} color={pathname == '/historial' ? "#00BF9C" : '#6B7280'} /></div><div className={menu ? "block font-semibold" : "hidden"}>Historial</div>
+                                <div><Bolt size={20} color={pathname == '/ventas' ? "#0ea5e9" : 'white'} /></div><div className={menu ? "block font-semibold" : "hidden"}>Configuración</div>
                             </a>
                         </li>
                     </ul>
-                    <div className={`${menu ? "flex" : "hidden"} flex md:hidden flex-col justify-center items-start py-4`}>
-                        <div className="flex w-full flex-col items-center gap-4 justify-between">
-                            <div className="flex flex-col justify-center items-center gap-1">
-                                <div className="w-[40px] h-[40px] bg-[#dedede] rounded-full object-cover">
-                                    <Image
-                                        className="w-full object-cover"
-                                        src="/user.png"
-                                        alt="Logo coffee sena"
-                                        height={40}
-                                        width={40}
-                                    />
-                                </div>
-                                <div className="font-semibold">Admin</div>
-                            </div>
-                            <div className="p-2 rounded-lg cursor-pointer transition-all duration-150 ml-1 text-center bg-red-500 text-white flex items-center justify-center gap-2 text-sm font-semibold overflow-hidden whitespace-nowrap">
-                                <a className="logout-span" href="/auth"> <ArrowRightFromLine size={24}/></a>
-                            </div>
-                        </div>
+                    <div>
+                        <div>Admin</div>
                     </div>
                 </nav>
-            </div>
-            <div className="hidden md:flex flex-col justify-center items-start">
-                <div className="flex w-full flex-col items-center gap-4 justify-between">
-                    <div className="flex flex-col justify-center items-center gap-1">
-                        <div className="w-[40px] h-[40px] bg-[#dedede] rounded-full object-cover">
-                            <Image
-                                className="w-full object-cover"
-                                src="/user.png"
-                                alt="Logo coffee sena"
-                                height={40}
-                                width={40}
-                            />
-                        </div>
-                        <div className="font-semibold">Admin</div>
-                    </div>
-                    <div className="p-2 rounded-lg cursor-pointer transition-all duration-150 ml-1 text-center bg-red-500 text-white flex items-center justify-center gap-2 text-sm font-semibold overflow-hidden whitespace-nowrap">
-                        <a className="logout-span" href="/auth"> <ArrowRightFromLine size={24} className={menu ? "hidden" : "block"} />{menu ? 'Cerrar sesión' : ''}</a>
-                    </div>
-                </div>
             </div>
         </aside>
     );

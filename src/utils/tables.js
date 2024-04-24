@@ -131,6 +131,35 @@ export const columsProducts = [
 	{
 		name: 'Precio',
 		selector: row => row.precio,
+		sortable: true,
+	},
+	{
+		name: '',
+		selector: row => row.editar,
+	},
+	{
+		name: '',
+		selector: row => row.eliminar,
+	},
+];
+
+// PROVEEDORES 
+
+export const columsProveedores = [
+	{
+		name: 'Nombre',
+		selector: row => row.nombre,
+		sortable: true,
+	},
+	{
+		name: 'Contacto',
+		selector: row => row.contacto,
+		sortable: true,
+	},
+	{
+		name: 'Estado',
+		selector: row => row.estado,
+		sortable: true,
 	},
 	{
 		name: '',

@@ -3,7 +3,10 @@ import styles from './Spinner.module.scss'
 
 function Spinner() {
   return (
-    <span class={styles.loader}></span>
+    <div className={styles.container}>
+      <span className={styles.loader}></span>
+      <span>Cargando...</span>
+    </div>
   )
 }
 
