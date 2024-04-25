@@ -4,7 +4,7 @@ import Image from "next/image";
 import React from "react";
 import { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
-import { columsProveedores } from "@/utils/tables";
+import { columsLotes } from "@/utils/tables";
 import { getCookie } from "cookies-next";
 import {
     CirclePlus,
@@ -16,6 +16,9 @@ import {
     X,
     Trash2,
     Truck,
+    QrCode,
+    CalendarPlus,
+    CalendarOff,
 } from "lucide-react";
 import Spinner from "@/components/Spinner/Spinner";
 
@@ -36,7 +39,7 @@ export default function Page() {
         if (confirmar) {
             try {
                 fetch(
-                    `http://localhost:3000/api/v1/providers/delete/${e.target.value}`,
+                    `http://localhost:3000/api/v1/lotes/delete/${e.target.value}`,
                     {
                         method: "DELETE",
                         headers: {
@@ -45,7 +48,7 @@ export default function Page() {
                         },
                     }
                 );
-                location.reload()
+                // location.reload()
             } catch (e) {
                 console.log(e);
             }
@@ -56,7 +59,7 @@ export default function Page() {
 
     const fetchEditar = e => {
         try {
-            fetch(`http://localhost:3000/api/v1/providers/${e.target.value}`,{
+            fetch(`http://localhost:3000/api/v1/lotes/${e.target.value}`,{
                 method: 'GET',
                 headers: {
                     Authorization: 'Bearer '+ token
@@ -75,7 +78,7 @@ export default function Page() {
 
     useEffect(() => {
         setLoading(true)
-        fetch("http://localhost:3000/api/v1/providers", {
+        fetch("http://localhost:3000/api/v1/lotes", {
             method: 'GET',
             headers: {
                 Authorization: 'Bearer ' + token
@@ -84,15 +87,15 @@ export default function Page() {
             .then(response => response.json())
             .then(data => {
                 console.log(data.data);
-                const productos = data.data.map(proveedor => ({
-                    nombre: proveedor.PROV_NOM,
-                    contacto: proveedor.PROV_CONTACTO == null ? "No hay contacto" : proveedor.PROV_CONTACTO,
-                    estado: proveedor.PROV_EST == "A" ? "Activo" : "Inactivo",
+                const productos = data.data.map(lote => ({
+                    codigo: lote.COD_LOTE,
+                    fecha_reci: lote.FEC_REC,
+                    fecha_venc: lote.FEC_VENC,
                     editar: (
                         <div className="p-2">
                             <button
-                                key={proveedor.PROV_ID}
-                                value={proveedor.PROV_ID}
+                                key={lote.ID_LOTE}
+                                value={lote.ID_LOTE}
                                 className="bg-sky-500 p-2 rounded-lg text-white"
                                 onClick={fetchEditar}
                             >
@@ -103,8 +106,8 @@ export default function Page() {
                     eliminar: (
                         <div className="p-2">
                             <button
-                                key={proveedor.PROV_ID}
-                                value={proveedor.PROV_ID}
+                                key={lote.ID_LOTE}
+                                value={lote.ID_LOTE}
                                 className="bg-red-500 p-2 rounded-lg text-white"
                                 onClick={eliminarProducto}
                             >
@@ -140,9 +143,9 @@ export default function Page() {
         setEditProduct(false);
     };
 
-    const fetchAddProveedor = e => {
+    const fetchAddLote = e => {
         e.preventDefault();
-        fetch("http://localhost:3000/api/v1/providers/create", {
+        fetch("http://localhost:3000/api/v1/lotes/create", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -150,8 +153,9 @@ export default function Page() {
                     "Bearer " + token,
             },
             body: JSON.stringify({
-                PROV_NOM: document.getElementById("PROV_NOM").value,
-                PROV_CONTACTO: document.getElementById("PROV_CONTACTO").value,
+                COD_LOTE: document.getElementById("COD_LOTE").value,
+                FEC_REC: document.getElementById("FEC_REC").value,
+                FEC_VENC: document.getElementById("FEC_VENC").value,
             }),
         })
             .then(response => response.json())
@@ -163,10 +167,10 @@ export default function Page() {
             });
     };
 
-    const fetchEditProduct = e => {
+    const fetchEditLote = e => {
         e.preventDefault();
         fetch(
-            `http://localhost:3000/api/v1/providers/update/${e.target.value}`,
+            `http://localhost:3000/api/v1/lotes/update/${e.target.value}`,
             {
                 method: "PUT",
                 headers: {
@@ -175,8 +179,8 @@ export default function Page() {
                         "Bearer " + token,
                 },
                 body: JSON.stringify({
-                    PROV_NOM: document.getElementById("PROV_NOM_edit").value,
-                    PROV_CONTACTO: document.getElementById("PROV_CONTACTO_edit").value,
+                    FEC_REC: document.getElementById("FEC_REC_edit").value,
+                    FEC_VENC: document.getElementById("FEC_VENC_edit").value,
                 }),
             }
         )
@@ -191,7 +195,7 @@ export default function Page() {
 
     const handleChange = (e) => {
         const filteredRecords = firstData.filter(record => {
-            return record.nombre.toLowerCase().includes(e.target.value.toLowerCase())
+            return record.codigo.toLowerCase().includes(e.target.value.toLowerCase())
         })
         setRecords(filteredRecords)
     }
@@ -205,7 +209,7 @@ export default function Page() {
                     } transition-all duration-150 justify-center items-center w-screen h-screen absolute z-[1000000000000000] bg-gray-500 bg-opacity-50 backdrop-blur-sm`}
             >
                 <form
-                    onSubmit={fetchAddProveedor}
+                    onSubmit={fetchAddLote}
                     className="w-[450px] bg-white h-[450px] rounded-xl p-3 flex flex-col items-center relative"
                 >
                     <div
@@ -215,31 +219,42 @@ export default function Page() {
                         <X size={20} color="white" />
                     </div>
                     <h6 className="text-center text-lg font-black uppercase">
-                        Añadir proveedor
+                        Crear lote
                     </h6>
                     <div className="w-full flex flex-col items-center gap-3 justify-center h-full">
                         <div className="flex flex-col justify-center w-4/5">
                             <label className="text-sm font-semibold flex items-center gap-1">
-                                <Truck size={16} /> Nombre del proveedor
+                                <QrCode size={16} /> Código del lote
                             </label>
                             <input
-                                id="PROV_NOM"
-                                name="PROV_NOM"
-                                placeholder="Coca-cola"
+                                id="COD_LOTE"
+                                name="COD_LOTE"
+                                placeholder="5FG5HF"
                                 type="text"
                                 className=" rounded-md py-1 px-2 border border-1 border-gray-500"
                             />
                         </div>
                         <div className="flex flex-col justify-center w-4/5">
                             <label className="text-sm font-semibold flex items-center gap-1">
-                                <Truck size={16} />
-                                Contacto
+                                <CalendarPlus size={16} />
+                                Fecha de recibimiento
                             </label>
                             <input
-                                id="PROV_CONTACTO"
-                                name="PROV_CONTACTO"
-                                placeholder="cocacola@gmail.com"
-                                type="text"
+                                id="FEC_REC"
+                                name="FEC_REC"
+                                type="date"
+                                className=" rounded-md py-1 px-2 border border-1 border-gray-500"
+                            />
+                        </div>
+                        <div className="flex flex-col justify-center w-4/5">
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <CalendarOff size={16} />
+                                Fecha de vencimiento
+                            </label>
+                            <input
+                                id="FEC_VENC"
+                                name="FEC_VENC"
+                                type="date"
                                 className=" rounded-md py-1 px-2 border border-1 border-gray-500"
                             />
                         </div>
@@ -265,42 +280,41 @@ export default function Page() {
                         <X size={20} color="white" />
                     </div>
                     <h6 className="text-center text-lg font-black uppercase">
-                        Editar proveedor
+                        Editar lote
                     </h6>
                     <div className="w-full flex flex-col items-center gap-3 justify-center h-full">
                         <div className="flex flex-col justify-center w-4/5">
                             <label className="text-sm font-semibold flex items-center gap-1">
-                                <Truck size={16} /> Nombre del proveedor
+                                <CalendarPlus size={16} />
+                                Fecha de recibimiento
                             </label>
                             <input
-                                id="PROV_NOM_edit"
-                                name="PROV_NOM_edit"
-                                placeholder="Alkosto"
-                                type="text"
+                                id="FEC_REC_edit"
+                                name="FEC_REC_edit"
+                                type="date"
                                 className=" rounded-md py-1 px-2 border border-1 border-gray-500"
-                                defaultValue={formEdit.PROV_NOM}
+                                defaultValue={formEdit.FEC_REC}
                             />
                         </div>
                         <div className="flex flex-col justify-center w-4/5">
                             <label className="text-sm font-semibold flex items-center gap-1">
-                                <Truck size={16} />
-                                Contacto
+                                <CalendarOff size={16} />
+                                Fecha de vencimiento
                             </label>
                             <input
-                                id="PROV_CONTACTO_edit"
-                                name="PROV_CONTACTO_edit"
-                                placeholder="alkosto@alkosto.com"
-                                type="text"
+                                id="FEC_VENC_edit"
+                                name="FEC_VENC_edit"
+                                type="date"
                                 className=" rounded-md py-1 px-2 border border-1 border-gray-500"
-                                defaultValue={formEdit.PROV_CONTACTO}
+                                defaultValue={formEdit.FEC_VENC}
                             />
                         </div>
                     </div>
                     <button
-                        value={formEdit.PROV_ID}
+                        value={formEdit.ID_LOTE}
                         type="submit"
                         className="bg-transparent py-2 px-3 rounded-xl text-black font-semibold border-2 border-black transition-all duration-150 hover:text-white hover:bg-black text-sm"
-                        onClick={fetchEditProduct}
+                        onClick={fetchEditLote}
                     >
                         Aceptar
                     </button>
@@ -309,12 +323,12 @@ export default function Page() {
             <div className="w-full p-6 ml-0 lg:ml-[200px] 2xl:ml-[200px] mt-[80px] lg:mt-0">
                 <div className="overflow-auto">
                     <div className="flex items-center justify-between w-full flex-col sm:flex-row gap-4">
-                        <h3 className="font-bold text-xl">Proveedores</h3>
+                        <h3 className="font-bold text-xl">Lotes</h3>
                         <button
                             onClick={showFormAddProduct}
                             className="bg-sky-500 text-white p-2 rounded-md flex items-center gap-2 text-sm"
                         >
-                            <CirclePlus /> Añadir proveedor
+                            <CirclePlus /> Crear lote
                         </button>
                     </div>
                     <hr className="mt-4" />
@@ -324,7 +338,7 @@ export default function Page() {
                                 <label className="text-sm">Buscar:</label>
                                 <input
                                     type="text"
-                                    placeholder="Alkosto, Olimpica, Pepsi..."
+                                    placeholder="5FGH67"
                                     className="text-sm border border-1 border-gray-300 rounded-lg p-2"
                                     onChange={handleChange}
                                 />
@@ -338,7 +352,7 @@ export default function Page() {
                         <div className="bg-gray-100 p-2 rounded-lg overflow-auto flex flex-col justify-center items-center w-full">
                             {/* <h3 className="font-bold text-lg m-2">Productos</h3> */}
                             <DataTable
-                                columns={columsProveedores}
+                                columns={columsLotes}
                                 data={records}
                                 pagination
                                 paginationComponentOptions={

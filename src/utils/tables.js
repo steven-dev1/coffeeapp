@@ -39,7 +39,7 @@ export const columsPopular = [
 ];
 
 export const dataHome = [
-  	{
+	{
 		id: 1,
 		product: 'Jugo HIT 500ml',
 		price: 1988,
@@ -84,19 +84,19 @@ export const columsInventory = [
 ];
 
 export const dataInventory = [
-  	{
+	{
 		name: 'Coca-cola',
 		price: 2000,
 		cant: 19,
 		actions: <div className="flex gap-2 items-center"><button className="bg-sky-500 p-2 rounded-lg text-white">Editar</button><button className="bg-red-500 p-2 rounded-lg text-white">Eliminar</button></div>,
 	},
-  	{
+	{
 		name: 'Detodito picante',
 		price: 2500,
 		cant: 13,
 		actions: <div className="flex gap-2 items-center"><button className="bg-sky-500 p-2 rounded-lg text-white">Editar</button><button className="bg-red-500 p-2 rounded-lg text-white">Eliminar</button></div>,
 	},
-  	{
+	{
 		name: 'Pizzas',
 		price: 3500,
 		cant: 20,
@@ -168,5 +168,59 @@ export const columsProveedores = [
 	{
 		name: '',
 		selector: row => row.eliminar,
+	},
+];
+
+export const columsLotes = [
+	{
+		name: 'Código',
+		selector: row => row.codigo,
+		sortable: true,
+	},
+	{
+		name: 'Fecha de recibimiento',
+		selector: row => row.fecha_reci,
+		sortable: true,
+	},
+	{
+		name: 'Fecha de vencimiento',
+		selector: row => row.fecha_venc,
+		sortable: true,
+	},
+	{
+		name: '',
+		selector: row => row.editar,
+	},
+	{
+		name: '',
+		selector: row => row.eliminar,
+	},
+];
+
+export const columsExistencias = [
+	{
+		name: 'Producto',
+		selector: row => row.producto,
+		sortable: true,
+	},
+	{
+		name: 'Precio',
+		selector: row => row.precio,
+		sortable: true,
+	},
+	{
+		name: 'Cantidad',
+		selector: row => row.cantidad,
+		sortable: true,
+	},
+	{
+		name: 'Código del lote',
+		selector: row => row.lote,
+		sortable: true,
+	},
+	{
+		name: 'Fecha de vencimiento',
+		selector: row => row.fecha_venc,
+		sortable: true,
 	},
 ];

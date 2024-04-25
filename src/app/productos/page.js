@@ -5,6 +5,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import { dataInventory, columsProducts } from "@/utils/tables";
+import { getCookie } from "cookies-next";
 import {
     CirclePlus,
     Hash,
@@ -27,6 +28,8 @@ export default function Page() {
 
     const [categories, setCategories] = useState([]);
 
+    const token = getCookie('sessionToken')
+
     const eliminarProducto = e => {
         const confirmar = confirm('¿Estás seguro que quieres eliminar este producto?')
         if (confirmar) {
@@ -38,11 +41,16 @@ export default function Page() {
                         headers: {
                             Authorization:
                                 "Bearer " +
-                                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7IklkX1VzZXIiOiI2YzBsMTEwNGx2YXh3NGE4IiwiTm9tX1VzZXIiOiJTdGV2ZW4iLCJBcGVfVXNlciI6IkdvbnphbGV6IiwiRW1hX1VzZXIiOiJzdGV2ZW5AZ21haWwuY29tIiwiSWRfUm9sX0ZLIjoxfSwiaWF0IjoxNzEzNzkxNzMxLCJleHAiOjE3MTM4NzgxMzF9.rkpM5m_gAdFT-3DC6hSd9qLEBowQVtqVff-Tbt8lJco",
+                                token,
                         },
                     }
-                );
-                location.reload()
+                )
+                    .then(response => response.json())
+                    .then(response => {
+                        if (response.code === 403) {
+                            alert("No puedes eliminar este producto porque tiene proveedores asociados")
+                        }
+                    })
             } catch (e) {
                 console.log(e);
             }
@@ -56,7 +64,6 @@ export default function Page() {
             fetch(`http://localhost:3000/api/v1/products/${e.target.value}`)
                 .then(response => response.json())
                 .then(response => {
-                    console.log(response.data);
                     setFormEdit(response.data);
                 });
             setEditProduct(true);
@@ -70,13 +77,12 @@ export default function Page() {
         fetch("http://localhost:3000/api/v1/products")
             .then(response => response.json())
             .then(data => {
-                console.log(data.data);
                 const productos = data.data.map(producto => ({
                     codigo: producto.PROD_COD,
                     nombre: producto.PROD_NOM,
                     desc: producto.PROD_DESC,
                     categoria: producto.categoria.Nom_Cat,
-                    precio: producto.PROD_PREC,
+                    precio: `$${producto.PROD_PREC}`,
                     editar: (
                         <div className="p-2">
                             <button
@@ -142,8 +148,7 @@ export default function Page() {
             headers: {
                 "Content-Type": "application/json",
                 Authorization:
-                    "Bearer " +
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7IklkX1VzZXIiOiI2c3M3YmNsdmJsMzQyZSIsIk5vbV9Vc2VyIjoiU3RldmVuIiwiQXBlX1VzZXIiOiJHb256YWxleiIsIkVtYV9Vc2VyIjoic3RldmVuQGdtYWlsLmNvbSIsIklkX1JvbF9GSyI6MX0sImlhdCI6MTcxMzkxMTgxMywiZXhwIjoxNzEzOTk4MjEzfQ.DrY7VxTmq-xn9flmQVkoOUWYLeooC4p2Cb-2PzeEPAQ",
+                    "Bearer " + token,
             },
             body: JSON.stringify({
                 PROD_COD: document.getElementById("PROD_COD").value,
@@ -151,6 +156,9 @@ export default function Page() {
                 PROD_DESC: document.getElementById("PROD_DESC").value,
                 CAT_ID_FK: document.getElementById("CAT_ID_FK").value,
                 PROD_PREC: document.getElementById("PROD_PREC").value,
+                ID_LOTE: document.getElementById("ID_LOTE").value,
+                ID_PROV: document.getElementById("ID_PROV").value,
+                INV_ID: document.getElementById("INV_ID").value
             }),
         })
             .then(response => response.json())
@@ -172,7 +180,7 @@ export default function Page() {
                     "Content-Type": "application/json",
                     Authorization:
                         "Bearer " +
-                        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7IklkX1VzZXIiOiI2c3M3YmNsdmJsMzQyZSIsIk5vbV9Vc2VyIjoiU3RldmVuIiwiQXBlX1VzZXIiOiJHb256YWxleiIsIkVtYV9Vc2VyIjoic3RldmVuQGdtYWlsLmNvbSIsIklkX1JvbF9GSyI6MX0sImlhdCI6MTcxMzkxMTgxMywiZXhwIjoxNzEzOTk4MjEzfQ.DrY7VxTmq-xn9flmQVkoOUWYLeooC4p2Cb-2PzeEPAQ",
+                        token,
                 },
                 body: JSON.stringify({
                     PROD_COD: document.getElementById("PROD_COD_edit").value,
@@ -192,6 +200,99 @@ export default function Page() {
             });
     };
 
+
+    const [lotes, setLotes] = useState([])
+    const [inventories, setInventories] = useState([])
+    const [proveedores, setProveedores] = useState([])
+    useEffect(() => {
+        fetch("http://localhost:3000/api/v1/lotes", {
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then(response => response.json())
+            .then(response => {
+                setLotes(response.data)
+            })
+
+        fetch('http://localhost:3000/api/v1/inventories', {
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then(response => response.json())
+            .then(response => {
+                setInventories(response.data)
+            })
+
+        fetch('http://localhost:3000/api/v1/providers', {
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then(response => response.json())
+            .then(response => {
+                console.log(response.data)
+                setProveedores(response.data)
+            })
+    }, [])
+
+    // EVENTOS EDITAR
+    const [dataEditProduct, setDataEditProduct] = useState({
+    })
+    const handleChangeCodProducto = (e) => {
+        dataEditProduct(prevState => ({
+            ...prevState,  // Mantener las propiedades existentes
+            PROD_COD: e.target.value
+        }))
+    }
+    const handleChangeNomProducto = (e) => {
+        dataEditProduct(prevState => ({
+            ...prevState,  // Mantener las propiedades existentes
+            PROD_NOM: e.target.value
+        }))
+    }
+    const handleChangeDescProducto = (e) => {
+        dataEditProduct(prevState => ({
+            ...prevState,  // Mantener las propiedades existentes
+            PROD_DESC: e.target.value
+        }))
+    }
+    const handleChangePrecProducto = (e) => {
+        dataEditProduct(prevState => ({
+            ...prevState,  // Mantener las propiedades existentes
+            PROD_PREC: e.target.value
+        }))
+    }
+    const handleChangeCatProducto = (e) => {
+        dataEditProduct(prevState => ({
+            ...prevState,  // Mantener las propiedades existentes
+            CAT_ID_FK: e.target.value
+        }))
+    }
+    const handleChangeLoteProducto = (e) => {
+        dataEditProduct(prevState => ({
+            ...prevState,  // Mantener las propiedades existentes
+            ID_LOTE: e.target.value
+        }))
+    }
+    const handleChangeInvProducto = (e) => {
+        dataEditProduct(prevState => ({
+            ...prevState,  // Mantener las propiedades existentes
+            INV_ID: e.target.value
+        }))
+    }
+    const handleChangeProvProducto = (e) => {
+        dataEditProduct(prevState => ({
+            ...prevState,  // Mantener las propiedades existentes
+            ID_PROV: e.target.value
+        }))
+    }
+
+
     const handleChange = (e) => {
         const filteredRecords = firstData.filter(record => {
             return record.nombre.toLowerCase().includes(e.target.value.toLowerCase())
@@ -205,11 +306,11 @@ export default function Page() {
             {/* FORM AGREGAR */}
             <div
                 className={`flex ${addProduct ? "scale-100 opacity-1" : "scale-0 opacity-0"
-                    } transition-all duration-150 justify-center items-center w-screen h-screen absolute z-[1000000000000000] bg-gray-500 bg-opacity-50 backdrop-blur-sm`}
+                    } transition-all duration-150 justify-center items-center w-screen h-screen absolute z-[1000000000000000] bg-gray-900 bg-opacity-50 backdrop-blur-3xl`}
             >
                 <form
                     onSubmit={fetchAddProduct}
-                    className="w-[450px] bg-white h-[450px] rounded-xl p-3 flex flex-col items-center relative"
+                    className="min-w-[450px] bg-white min-h-[450px] rounded-xl p-3 flex flex-col items-center justify-between relative"
                 >
                     <div
                         onClick={removeFormAddProduct}
@@ -220,7 +321,7 @@ export default function Page() {
                     <h6 className="text-center text-lg font-black uppercase">
                         Agregar producto
                     </h6>
-                    <div className="w-full flex flex-col items-center gap-3 justify-center h-full">
+                    <div className="w-full grid grid-cols-2 justify-items-center items-center gap-3 justify-center h-full">
                         <div className="flex flex-col justify-center w-4/5">
                             <label className="text-sm font-semibold flex items-center gap-1">
                                 <Hash size={16} /> Código del producto
@@ -293,10 +394,76 @@ export default function Page() {
                                 })}
                             </select>
                         </div>
+                        <div className="flex flex-col justify-center w-4/5">
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <Layers3 size={16} />
+                                Lote
+                            </label>
+                            <select
+                                id="ID_LOTE"
+                                name="ID_LOTE"
+                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
+                            >
+                                {lotes.map(lote => {
+                                    return (
+                                        <option
+                                            key={lote.ID_LOTE}
+                                            value={lote.ID_LOTE}
+                                        >
+                                            Código: {lote.COD_LOTE}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
+                        <div className="flex flex-col justify-center w-4/5">
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <Layers3 size={16} />
+                                Inventario
+                            </label>
+                            <select
+                                id="INV_ID"
+                                name="INV_ID"
+                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
+                            >
+                                {inventories.map(inventory => {
+                                    return (
+                                        <option
+                                            key={inventory.INV_ID}
+                                            value={inventory.INV_ID}
+                                        >
+                                            Inventario: {inventory.INV_ID}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
+                        <div className="flex flex-col justify-center w-4/5">
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <Layers3 size={16} />
+                                Proveedor
+                            </label>
+                            <select
+                                id="ID_PROV"
+                                name="ID_PROV"
+                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
+                            >
+                                {proveedores.map(proveedor => {
+                                    return (
+                                        <option
+                                            key={proveedor.PROV_ID}
+                                            value={proveedor.PROV_ID}
+                                        >
+                                            {proveedor.PROV_NOM}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
                     </div>
                     <button
                         type="submit"
-                        className="bg-transparent py-2 px-3 rounded-xl text-black font-semibold border-2 border-black transition-all duration-150 hover:text-white hover:bg-black text-sm"
+                        className="bg-transparent py-2 px-3 rounded-xl text-black font-semibold border-2 border-black transition-all duration-150 my-2 hover:text-white hover:bg-black text-sm"
                     >
                         Aceptar
                     </button>
@@ -307,7 +474,7 @@ export default function Page() {
                 className={`flex ${editProduct ? "scale-100 opacity-1" : "scale-0 opacity-0"
                     } transition-all duration-150 justify-center items-center w-screen h-screen absolute z-[1000000000000000] bg-gray-500 bg-opacity-50 backdrop-blur-sm`}
             >
-                <form className="w-[450px] bg-white h-[450px] rounded-xl p-3 flex flex-col items-center relative">
+                <form className="min-w-[450px] bg-white min-h-[450px] rounded-xl p-3 flex flex-col justify-between items-center relative">
                     <div
                         onClick={removeFormEditProduct}
                         className="cursor-pointer absolute top-3 right-5 bg-red-500 rounded-full p-1"
@@ -317,7 +484,7 @@ export default function Page() {
                     <h6 className="text-center text-lg font-black uppercase">
                         Editar producto
                     </h6>
-                    <div className="w-full flex flex-col items-center gap-3 justify-center h-full">
+                    <div className="w-full grid grid-cols-2 justify-items-center items-center gap-3 justify-center h-full">
                         <div className="flex flex-col justify-center w-4/5">
                             <label className="text-sm font-semibold flex items-center gap-1">
                                 <Hash size={16} /> Código del producto
@@ -329,6 +496,7 @@ export default function Page() {
                                 type="text"
                                 className=" rounded-md py-1 px-2 border border-1 border-gray-500"
                                 defaultValue={formEdit.PROD_COD}
+                                onChange={handleChangeCodProducto}
                             />
                         </div>
                         <div className="flex flex-col justify-center w-4/5">
@@ -343,6 +511,7 @@ export default function Page() {
                                 type="text"
                                 className=" rounded-md py-1 px-2 border border-1 border-gray-500"
                                 defaultValue={formEdit.PROD_NOM}
+                                onChange={handleChangeNomProducto}
                             />
                         </div>
                         <div className="flex flex-col justify-center w-4/5">
@@ -357,6 +526,7 @@ export default function Page() {
                                 type="text"
                                 className="rounded-md py-1 px-2 border border-1 border-gray-500"
                                 defaultValue={formEdit.PROD_DESC}
+                                onChange={handleChangeDescProducto}
                             />
                         </div>
                         <div className="flex flex-col justify-center w-4/5">
@@ -370,6 +540,7 @@ export default function Page() {
                                 type="number"
                                 className="rounded-md py-1 px-2 border border-1 border-gray-500"
                                 defaultValue={formEdit.PROD_PREC}
+                                onChange={handleChangePrecProducto}
                             />
                         </div>
                         <div className="flex flex-col justify-center w-4/5">
@@ -381,6 +552,7 @@ export default function Page() {
                                 id="CAT_ID_FK_edit"
                                 name="CAT_ID_FK"
                                 className="rounded-md py-1 px-2 border border-1 border-gray-500"
+                                onChange={handleChangeCatProducto}
                             // defaultValue={formEdit.CAT_ID_FK}
                             >
                                 {categories.map(category => {
@@ -390,6 +562,75 @@ export default function Page() {
                                             value={category.Id_Cat}
                                         >
                                             {category.Nom_Cat}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
+                        <div className="flex flex-col justify-center w-4/5">
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <Layers3 size={16} />
+                                Lote
+                            </label>
+                            <select
+                                id="ID_LOTE"
+                                name="ID_LOTE"
+                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
+                                onChange={handleChangeLoteProducto}
+                            >
+                                {lotes.map(lote => {
+                                    return (
+                                        <option
+                                            key={lote.ID_LOTE}
+                                            value={lote.ID_LOTE}
+                                        >
+                                            Código: {lote.COD_LOTE}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
+                        <div className="flex flex-col justify-center w-4/5">
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <Layers3 size={16} />
+                                Inventario
+                            </label>
+                            <select
+                                id="INV_ID"
+                                name="INV_ID"
+                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
+                                onChange={handleChangeInvProducto}
+                            >
+                                {inventories.map(inventory => {
+                                    return (
+                                        <option
+                                            key={inventory.INV_ID}
+                                            value={inventory.INV_ID}
+                                        >
+                                            Inventario: {inventory.INV_ID}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
+                        <div className="flex flex-col justify-center w-4/5">
+                            <label className="text-sm font-semibold flex items-center gap-1">
+                                <Layers3 size={16} />
+                                Proveedor
+                            </label>
+                            <select
+                                id="ID_PROV"
+                                name="ID_PROV"
+                                className="rounded-md py-1 px-2 border border-1 border-gray-500"
+                                onChange={handleChangeProvProducto}
+                            >
+                                {proveedores.map(proveedor => {
+                                    return (
+                                        <option
+                                            key={proveedor.PROV_ID}
+                                            value={proveedor.PROV_ID}
+                                        >
+                                            {proveedor.PROV_NOM}
                                         </option>
                                     );
                                 })}
@@ -409,7 +650,7 @@ export default function Page() {
             <div className="w-full p-6 ml-0 lg:ml-[200px] 2xl:ml-[200px] mt-[80px] lg:mt-0">
                 <div className="overflow-auto">
                     <div className="flex items-center justify-between w-full flex-col sm:flex-row gap-4">
-                        <h3 className="font-semibold text-xl">Productos</h3>
+                        <h3 className="font-bold text-xl">Productos</h3>
                         <button
                             onClick={showFormAddProduct}
                             className="bg-sky-500 text-white p-2 rounded-md flex items-center gap-2 text-sm"
@@ -451,16 +692,10 @@ export default function Page() {
                                         style: {
                                             backgroundColor: "#0EA5E9",
                                             color: "#fff",
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
                                         },
                                     },
                                     cells: {
                                         style: {
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
                                             width: "100%",
                                         },
                                     },

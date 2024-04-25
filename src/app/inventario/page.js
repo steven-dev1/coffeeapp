@@ -4,19 +4,40 @@ import Image from "next/image";
 import React from "react";
 import { useState, useEffect } from "react";
 import DataTable from 'react-data-table-component';
-import { dataInventory, columsInventory } from "@/utils/tables";
-import { CirclePlus } from "lucide-react";
-import Pies from "@/components/stats";
+import { columsExistencias } from "@/utils/tables";
 import Spinner from "@/components/Spinner/Spinner";
+import { getCookie } from "cookies-next";
 
 function Page() {
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [firstData, setFirstData] = useState([]);
+    const [records, setRecords] = useState([]);
 
-    // useEffect(() => {
-    //     fetch("http://localhost:3000/api/v1/products")
-    //         .then(response => response.json())
-    //         .then(data => setProducts(data.data));
-    // }, []);
+    const token = getCookie('sessionToken')
+
+    useEffect(() => {
+        // setLoading(true)
+        fetch("http://localhost:3000/api/v1/inventories/exists/all", {
+            method: 'GET',
+            headers: {
+                Authorization: "Bearer " +token,
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.data)
+                const existencias = data.data.map((existencia) => ({
+                        producto: existencia.producto.PROD_NOM,
+                        precio: existencia.producto.PROD_PREC,
+                        cantidad: existencia.CANT_PROD,
+                        lote: existencia.lote.COD_LOTE,
+                        fecha_venc: existencia.lote.FEC_VENC
+                }))
+                setRecords(existencias)
+                setFirstData(existencias)
+                setLoading(false)
+            });
+    }, []);
 
     const paginationComponentOptions = {
         rowsPerPageText: 'Filas por página',
@@ -27,7 +48,7 @@ function Page() {
 
     const handleChange = (e) => {
         const filteredRecords = firstData.filter(record => {
-            return record.names.toLowerCase().includes(e.target.value.toLowerCase())
+            return record.producto.toLowerCase().includes(e.target.value.toLowerCase())
         })
         setRecords(filteredRecords)
     }
@@ -39,7 +60,7 @@ function Page() {
             <div className="w-full p-6 ml-0 md:ml-[200px] 2xl:ml-[200px] mt-[80px] md:mt-0">
                 <div className="overflow-auto">
                     <div className="flex items-center justify-between w-full flex-col sm:flex-row gap-4">
-                        <h3 className="font-semibold text-xl">Inventario</h3>
+                        <h3 className="font-bold text-xl">Inventario</h3>
                         <div className="flex items-center gap-2 w-full justify-between sm:justify-end">
                             {/* <button className="bg-[#00BF9C] text-white p-2 rounded-md flex items-center gap-2 text-sm"><CirclePlus /> Agregar producto</button> */}
                             <input type="date" />
@@ -53,14 +74,15 @@ function Page() {
                                 <input type="text" placeholder="Coca-cola 400ml" className="text-sm border border-1 border-gray-300 rounded-lg p-2" onChange={handleChange}/>
                             </div>
                             <div>
-                                <p className="text-sm">Resultados encontrados: {dataInventory.length}</p>
+                                <p className="text-sm">Resultados encontrados: {records.length}</p>
                             </div>
                         </div>
                         <div className="bg-gray-100 p-2 rounded-lg overflow-auto flex flex-col justify-center items-center">
                             {/* <h3 className="font-bold text-lg m-2">Productos</h3> */}
                             <DataTable
-                                columns={columsInventory}
-                                data={dataInventory}
+                                columns={columsExistencias}
+                                data={records}
+                                noDataComponent={"No se encontraron resultados"}
                                 pagination
                                 paginationComponentOptions={paginationComponentOptions}
                                 progressPending={loading}

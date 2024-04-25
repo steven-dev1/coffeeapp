@@ -4,9 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Mail, Asterisk, Lock, UserRound, CircleUserRound } from 'lucide-react';
 import Image from 'next/image';
+import { setCookie } from 'cookies-next';
+import Spinner from '@/components/SpinnerAuth/Spinner'
 
 function Page() {
   const [form, setForm] = useState(true)
+  const [loading, setLoading] = useState(false)
+  // const cookies = cookies();
   const navigate = useRouter()
   const [data, setData] = useState({
     "Ema_User": "",
@@ -31,6 +35,9 @@ function Page() {
         .then((response) => response.json())
         .then((data) => {
           if (data.code === 200) {
+            setLoading(true);
+            localStorage.setItem('sessionToken', data.data);
+            setCookie('sessionToken', data.data);
             navigate.push('/')
           }
         })
@@ -110,7 +117,7 @@ function Page() {
             </div>
           </div>
         </section>
-        <button type="submit" className={`${form ? "opacity-1" : "opacity-0"} flex font-semibold transition-all duration-150 border-2 border-black text-black hover:bg-black hover:text-white py-2 px-4 rounded-full`}>Iniciar sesión</button>
+        <button type="submit" className={`${form ? "opacity-1" : "opacity-0"} flex font-semibold transition-all duration-150 border-2 border-black text-black hover:bg-black hover:text-white py-2 px-4 rounded-full`}>{loading ? <Spinner /> : "Iniciar sesión" }</button>
       </form>
 
       {/* REGISTRO */}

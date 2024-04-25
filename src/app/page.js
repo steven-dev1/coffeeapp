@@ -7,10 +7,13 @@ import DataTable from "react-data-table-component";
 import { dataHome, columsHome, columsPopular } from "@/utils/tables";
 import { CalendarFold } from "lucide-react";
 import Pies from "@/components/stats";
+import { getCookie } from "cookies-next";
+import base64url from "base64url";
 
 function Page() {
     const [products, setProducts] = useState([]);
     const [dataPopular, setDataPopular] = useState([]);
+
 
     const paginationComponentOptions = {
         rowsPerPageText: "Filas por página",
@@ -19,12 +22,13 @@ function Page() {
         selectAllRowsItemText: "Todos",
     };
 
+    const token = getCookie('sessionToken')
     useEffect(() => {
         fetch("http://localhost:3000/api/v1/headers/type/1", {
             headers: {
                 Authorization:
                     "Bearer " +
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7IklkX1VzZXIiOiI2YzBsMTEwNGx2YXh3NGE4IiwiTm9tX1VzZXIiOiJTdGV2ZW4iLCJBcGVfVXNlciI6IkdvbnphbGV6IiwiRW1hX1VzZXIiOiJzdGV2ZW5AZ21haWwuY29tIiwiSWRfUm9sX0ZLIjoxfSwiaWF0IjoxNzEzNzkxNzMxLCJleHAiOjE3MTM4NzgxMzF9.rkpM5m_gAdFT-3DC6hSd9qLEBowQVtqVff-Tbt8lJco",
+                    token,
             },
         })
             .then(response => response.json())
@@ -45,7 +49,7 @@ function Page() {
             headers: {
                 Authorization:
                     "Bearer " +
-                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7IklkX1VzZXIiOiI2YzBsMTEwNGx2YXh3NGE4IiwiTm9tX1VzZXIiOiJTdGV2ZW4iLCJBcGVfVXNlciI6IkdvbnphbGV6IiwiRW1hX1VzZXIiOiJzdGV2ZW5AZ21haWwuY29tIiwiSWRfUm9sX0ZLIjoxfSwiaWF0IjoxNzEzNzkxNzMxLCJleHAiOjE3MTM4NzgxMzF9.rkpM5m_gAdFT-3DC6hSd9qLEBowQVtqVff-Tbt8lJco",
+                    token,
             },
         })
             .then(response => response.json())
@@ -61,6 +65,16 @@ function Page() {
 
     const date = new Date();
 
+    function parseJwt (token) {
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+    
+        return console.log(JSON.parse(jsonPayload));
+    }
+
     return (
         <main className="flex flex-col md:flex-row overflow-y-hidden">
             <Aside />
@@ -71,6 +85,7 @@ function Page() {
                         <div className="flex items-center gap-2">
                             <CalendarFold size={20} />{" "}
                             {date.toLocaleDateString()}
+                            <button onClick={parseJwt(token)}>Prueba</button>
                         </div>
                     </div>
                     <div className="my-4 w-full max-h-screen flex flex-col lg:flex-row justify-between gap-4 overflow-auto">
