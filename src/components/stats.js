@@ -9,10 +9,10 @@ const options = {
 };
 
 const data = {
-    labels: ['Carne', 'Jamón', 'Dulces', 'Turrón', 'Vino'],
+    labels: ['Gaseosa', 'Salchichón', 'Deditos', 'Donuts', 'Jugo del Valle'],
     datasets: [
         {
-            label: 'Popularidad en Navidad',
+            label: 'Más vendidos',
             data: [35, 20, 20, 15, 10],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',

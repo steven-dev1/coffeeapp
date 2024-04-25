@@ -85,8 +85,8 @@ function Aside() {
                         height={50}
                     />
                 </div>
-                <div className="w-full h-full flex flex-col justify-between">
-                    <nav className={`${menu ? "w-2/4 lg:w-full p-0" : "w-0 lg:w-full p-0"} flex flex-col justify-between absolute top-0 pt-[96px] z-50 left-0 lg:relative transition-all duration-150 bg-sky-500 mx-auto lg:block  lg:p-0 lg:bg-transparent h-screen lg:h-auto`}>
+                <div className="w-full h-full absolute lg:relative flex flex-col justify-between">
+                    <nav className={`${menu ? "w-2/4 lg:w-full p-0" : "w-0 lg:w-full p-0"} flex flex-col justify-between absolute top-0 pt-[100px] z-50 left-0 lg:relative transition-all duration-150 bg-sky-500 mx-auto lg:block  lg:p-0 lg:bg-transparent h-screen lg:h-auto`}>
                         <ul className={`${menu ? "flex" : "hidden lg:flex"} flex-col gap-2 list-none w-full`}>
                             <li className="transition-all duration-150 cursor-pointer">
                                 <a

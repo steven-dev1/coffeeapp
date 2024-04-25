@@ -1,14 +1,16 @@
 'use client'
 import Aside from '@/components/aside'
 import { useRouter } from 'next/navigation'
-import { Lock, Mail, Phone, User } from 'lucide-react'
+import { Lock, Mail, MailX, Phone, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { getCookie } from 'cookies-next'
 import React from 'react'
+import Spinner from '@/components/SpinnerAuth/Spinner'
 
 export default function Page() {
     const [firstDataUser, setFirstDataUser] = useState({})
     const [dataUser, setDataUser] = useState({})
+    const [loading, setLoading] = useState(true)
     const router = useRouter()
 
     const token = getCookie('sessionToken')
@@ -33,6 +35,7 @@ export default function Page() {
             .then(response => response.json())
             .then(response => {
                 setFirstDataUser(response.data)
+                setLoading(false)
             })
         } catch (err){
             console.log("Error: " + err)
@@ -119,6 +122,14 @@ export default function Page() {
                         </div>
                     </form>
                 </div>
+                    {firstDataUser.Est_Email_User == 0 ? 
+                    <div className='bg-red-100 text-red-500 p-3 rounded-lg my-3 lg:w-3/4 xl:w-2/4 mx-auto'>
+                        {loading ? <Spinner /> : ''}
+                        <div className='w-full flex flex-col sm:flex-row justify-between items-center'>
+                            <p className='flex gap-2 items-center'><MailX size={24} />El correo electrónico no ha sido verificado</p>
+                            <button className='bg-red-500 text-white p-2 rounded-lg mt-2 sm:mt-0 hover:bg-red-600 transition-all duration-150 font-semibold'>Verificar</button>
+                        </div>
+                    </div> : ""}
             </div>
         </main>
     )
