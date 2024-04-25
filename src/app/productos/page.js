@@ -685,6 +685,7 @@ export default function Page() {
                                 paginationComponentOptions={
                                     paginationComponentOptions
                                 }
+                                noDataComponent={<div className="text-red-700 font-semibold py-3">No se encontraron resultados</div>}
                                 progressPending={loading}
                                 progressComponent={<Spinner />}
                                 customStyles={{

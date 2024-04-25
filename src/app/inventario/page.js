@@ -82,7 +82,7 @@ function Page() {
                             <DataTable
                                 columns={columsExistencias}
                                 data={records}
-                                noDataComponent={"No se encontraron resultados"}
+                                noDataComponent={<div className="text-red-700 font-semibold py-3">No se encontraron resultados</div>}
                                 pagination
                                 paginationComponentOptions={paginationComponentOptions}
                                 progressPending={loading}
