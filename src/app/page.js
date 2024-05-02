@@ -5,14 +5,14 @@ import Aside from "../components/aside";
 import Image from "next/image";
 import DataTable from "react-data-table-component";
 import { dataHome, columsHome, columsPopular } from "@/utils/tables";
-import { CalendarFold } from "lucide-react";
+import { CalendarFold, CircleUserRound } from "lucide-react";
 import Pies from "@/components/stats";
 import { getCookie } from "cookies-next";
 import base64url from "base64url";
 
 function Page() {
-    const [products, setProducts] = useState([]);
-    const [dataPopular, setDataPopular] = useState([]);
+    const [lengthUsers, setLengthUsers] = useState(0);
+    const [loading, setLoading] = useState(true);
 
 
     const paginationComponentOptions = {
@@ -23,57 +23,38 @@ function Page() {
     };
 
     const token = getCookie('sessionToken')
+
     useEffect(() => {
-        fetch("http://localhost:3000/api/v1/headers/type/1", {
+        fetch('http://localhost:3000/api/v1/users', {
+            method: 'GET',
             headers: {
-                Authorization:
-                    "Bearer " +
-                    token,
-            },
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data.data);
-                const encabezados = data.data.map(enc => ({
-                    nombre: enc.Usuario.Nom_User + " " + enc.Usuario.Ape_User,
-                    metodo: enc.MET_PAGO == 1 ? "Efectivo" : "PSE",
-                    tipo:   enc.TIPO_ENCABE == 1 ? "Compra" : "Venta",
-                    fecha: enc.FECH_ENC,
-                    total: enc.TOTAL,
-                }));
-                
-                
-                setProducts(encabezados);
-            });
-        fetch("http://localhost:3000/api/v1/details", {
-            headers: {
-                Authorization:
-                    "Bearer " +
-                    token,
-            },
+                Authorization: 'Bearer ' + token
+            }
         })
             .then(response => response.json())
             .then(response => {
-                console.log(response)
-                const popularData = response.data.map(deta => ({
-                    product: deta.Producto.PROD_NOM,
-                    price: `$ ${parseFloat(deta.Producto.PROD_PREC).toFixed(2)}`,
-                }));
-                setDataPopular(popularData);
+                console.log(response.data)
+                const data = response.data;
+                const length = data.length;
+                setLengthUsers(length);
+                setLoading(false)
             });
     }, []);
 
     const date = new Date();
 
-    function parseJwt (token) {
+    function parseJwt(token) {
         var base64Url = token.split('.')[1];
         var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
-    
-        return console.log(JSON.parse(jsonPayload));
+
+        const data = JSON.parse(jsonPayload)
+        return localStorage.setItem('name', JSON.stringify(data.user));
     }
+
+    parseJwt(token)
 
     return (
         <main className="flex flex-col lg:flex-row overflow-y-hidden">
@@ -82,41 +63,26 @@ function Page() {
                 <div>
                     <div className="flex items-center justify-between px-4">
                         <h3 className="font-semibold text-xl">Inicio</h3>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 bg-gray-100 p-2 rounded-lg">
                             <CalendarFold size={20} />{" "}
                             {date.toLocaleDateString()}
-                            <button onClick={parseJwt(token)}>Prueba</button>
                         </div>
                     </div>
-                    <div className="my-4 w-full max-h-screen flex flex-col lg:flex-row justify-between gap-4 overflow-auto">
-                        <div className="bg-gray-100 p-2 rounded-lg overflow-auto flex-1">
-                            <h3 className="font-bold text-lg m-2">
-                                Ordenes recientes
-                            </h3>
-                            <DataTable
-                                columns={columsHome}
-                                data={products}
-                                pagination
-                                paginationComponentOptions={
-                                    paginationComponentOptions
-                                }
-                            />
-                        </div>
-                        <div className="flex flex-row lg:flex-col gap-2 justify-between">
-                            <div className="bg-gray-100 p-2 rounded-lg overflow-auto lg:max-w-[350px]">
-                                <h3 className="font-bold text-lg m-2">
-                                    Estadísticas
-                                </h3>
-                                <Pies />
+                    <div className="bg-gray-100 min-w-10 min-h-10 rounded-xl my-4 w-full max-h-screen flex flex-col lg:flex-row justify-between gap-4 overflow-auto">
+                        <div className="w-full mx-auto flex items-center justify-between p-4 gap-4">
+                            <div className="bg-white p-3 rounded-md min-h-[88px] w-full text-white flex items-center justify-center gap-2">
+                                <CircleUserRound size={60} color="rgb(14, 165, 233)"/>
+                                <div className="flex flex-col gap-1 justify-center">
+                                {loading ? <div className="bg-gray-300 w-full min-h-5 rounded-lg"></div> : <p className="font-black text-4xl text-left text-black">{lengthUsers}</p>}
+                                    <p className="text-sm text-black text-left">Usuarios registrados</p>
+                                </div>
                             </div>
-                            <div className="bg-gray-100 p-2 rounded-lg overflow-auto lg:max-w-[350px] flex flex-col justify-center items-center">
-                                <h3 className="font-bold text-lg m-2">
-                                    Populares hoy
-                                </h3>
-                                <DataTable
-                                    columns={columsPopular}
-                                    data={dataPopular}
-                                />
+                            <div className="bg-white p-3 rounded-md min-h-[88px] w-full text-white flex items-center justify-center gap-2">
+                                <CircleUserRound size={60} color="rgb(14, 165, 233)"/>
+                                <div className="flex flex-col gap-1 justify-center">
+                                {loading ? <div className="bg-gray-300 w-full min-h-5 rounded-lg"></div> : <p className="font-black text-4xl text-left text-black">{lengthUsers}</p>}
+                                    <p className="text-sm text-black text-left">Usuarios registrados</p>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -1,9 +1,12 @@
-import { Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
 // import styles from './home.module.scss'
 import "./globals.css";
 import toast, { Toaster } from 'react-hot-toast';
+import ToasterProvider from "@/components/toaste-provider";
+// import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
+import { AntdRegistry } from '@ant-design/nextjs-registry';
 
-const inter = Inter({ subsets: ["latin"] });
+const poppins = Poppins({ subsets: ["latin"], weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"] });
 
 export const metadata = {
   title: "Create Next App",
@@ -13,12 +16,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-        />
-        {children}
+      <body className={poppins.className}>
+        <AntdRegistry>
+          <ToasterProvider />
+          {children}
+        </AntdRegistry>
       </body>
     </html>
   );

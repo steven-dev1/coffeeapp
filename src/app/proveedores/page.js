@@ -44,8 +44,15 @@ export default function Page() {
                                 "Bearer " + token,
                         },
                     }
-                );
-                location.reload()
+                )
+                .then(response => response.json())
+                .then(response => {
+                    if (response.code === 500) {
+                        toast.error("No puedes eliminar este producto porque tiene productos asociados")
+                    } else {
+                        location.reload()
+                    }
+                })
             } catch (e) {
                 console.log(e);
             }

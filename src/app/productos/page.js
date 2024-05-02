@@ -17,6 +17,7 @@ import {
     Trash2,
 } from "lucide-react";
 import Spinner from "@/components/Spinner/Spinner";
+import toast from "react-hot-toast";
 
 export default function Page() {
     const [firstData, setFirstData] = useState([]);
@@ -48,7 +49,7 @@ export default function Page() {
                     .then(response => response.json())
                     .then(response => {
                         if (response.code === 403) {
-                            alert("No puedes eliminar este producto porque tiene proveedores asociados")
+                            toast.error("No puedes eliminar este producto porque tiene proveedores asociados")
                         }
                     })
             } catch (e) {
@@ -88,7 +89,7 @@ export default function Page() {
                             <button
                                 key={producto.PROD_ID}
                                 value={producto.PROD_ID}
-                                className="bg-sky-500 p-2 rounded-lg text-white"
+                                className="bg-sky-500 p-2 rounded-lg font-semibold text-white hover:bg-sky-600 transition-all duration-200"
                                 href={`/productos/${producto.Id_Cur}`}
                                 onClick={fetchEditar}
                             >
@@ -101,7 +102,7 @@ export default function Page() {
                             <button
                                 key={producto.PROD_ID}
                                 value={producto.PROD_ID}
-                                className="bg-red-500 p-2 rounded-lg text-white"
+                                className="bg-red-500 font-semibold p-2 rounded-lg text-white hover:bg-red-600 transition-all duration-200"
                                 onClick={eliminarProducto}
                             >
                                 Eliminar
@@ -653,7 +654,7 @@ export default function Page() {
                         <h3 className="font-bold text-xl">Productos</h3>
                         <button
                             onClick={showFormAddProduct}
-                            className="bg-sky-500 text-white p-2 rounded-md flex items-center gap-2 text-sm"
+                            className="bg-sky-500 hover:bg-sky-600 transition-all duration-200 text-white p-2 rounded-md flex items-center gap-2 text-sm"
                         >
                             <CirclePlus /> Agregar producto
                         </button>

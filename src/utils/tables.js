@@ -224,3 +224,29 @@ export const columsExistencias = [
 		sortable: true,
 	},
 ];
+
+export const columsBuysSells = [
+	{
+		name: 'Producto',
+		selector: row => row.producto,
+		sortable: true,
+	},
+	{
+		name: 'Precio',
+		selector: row => row.precio,
+		sortable: true,
+	},
+	{
+		name: 'Stock',
+		selector: row => row.stock,
+	},
+	{
+		name: 'Código del lote',
+		selector: row => row.lote,
+		sortable: true,
+	},
+	{
+		name: '',
+        selector: row => row.agregar,
+	}
+]

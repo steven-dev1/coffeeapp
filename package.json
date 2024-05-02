@@ -3,18 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port=3001",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@ant-design/nextjs-registry": "^1.0.0",
+    "antd": "^5.16.5",
     "base64url": "^3.0.1",
     "chart.js": "^4.4.2",
     "cookies-next": "^4.1.1",
     "jose": "^5.2.4",
     "lucide-react": "^0.371.0",
     "next": "14.2.2",
+    "primereact": "^10.6.4",
     "react": "^18",
     "react-chartjs-2": "^5.2.0",
     "react-data-table-component": "^7.6.2",
